@@ -1,1 +1,10 @@
-<div class="flex min-h-screen min-w-screen items-center justify-center">In development...</div>
+<script>
+	import { test } from '$lib/remote/test.remote';
+</script>
+
+<button
+	onclick={async () => {
+		const result = await test();
+		console.log(result);
+	}}>testing</button
+>
