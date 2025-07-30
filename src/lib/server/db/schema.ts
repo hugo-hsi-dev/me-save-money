@@ -1,10 +1,9 @@
 import { type SQL, sql } from 'drizzle-orm';
 import { date, index, numeric, pgEnum, pgTable, text, timestamp } from 'drizzle-orm/pg-core';
 
-const USER_NAME = ['Hugo', 'Cassie'] as const;
-export type UserName = (typeof USER_NAME)[number];
+export const userEnum = pgEnum('user_names', ['Hugo', 'Cassie']);
 
-const userEnum = pgEnum('user_names', USER_NAME);
+export type UserName = (typeof userEnum.enumValues)[number];
 
 export const session = pgTable('session', {
 	expiresAt: timestamp().notNull(),
