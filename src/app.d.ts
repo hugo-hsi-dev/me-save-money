@@ -3,13 +3,14 @@
 declare global {
 	namespace App {
 		interface Locals {
-			session: import('$lib/server/auth').SessionValidationResult['session'];
-			user: import('$lib/server/auth').SessionValidationResult['user'];
+			session: import('$lib/server/auth').Session;
+			user: import('$lib/server/auth').User;
 		}
-	} // interface Error {}
-	// interface Locals {}
-} // interface PageData {}
-// interface PageState {}
+		// interface Platform {}
+		// interface Error {}
+		// interface PageData {}
+		// interface PageState {}
+	}
+}
 
-// interface Platform {}
 export {};

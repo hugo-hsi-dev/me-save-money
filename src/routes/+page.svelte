@@ -1,10 +1,10 @@
 <script>
-	import { test } from '$lib/remote/test.remote';
+	import { signIn } from '$lib/remote/auth.remote';
 </script>
 
 <button
 	onclick={async () => {
-		const result = await test();
+		const result = await signIn({ pin: '081915' });
 		console.log(result);
 	}}>testing</button
 >

@@ -4,24 +4,26 @@ import { sha256 } from '@oslojs/crypto/sha2';
 import { encodeBase32LowerCaseNoPadding, encodeHexLowerCase } from '@oslojs/encoding';
 import { eq } from 'drizzle-orm';
 
+import type { UserName } from './db/schema';
+
 import { db } from './db';
 import * as tables from './db/schema';
 
 export type Session = Awaited<ReturnType<typeof validateSessionToken>>['session'];
 export type User = Awaited<ReturnType<typeof validateSessionToken>>['user'];
 
-export async function createSession(token: string, userName: string) {
+export async function createSession(token: string, user: UserName) {
 	const sessionId = encodeHexLowerCase(sha256(new TextEncoder().encode(token)));
 
 	const session = {
 		expiresAt: new Date(Date.now() + 60 * 60 * 24 * 30), // 30 days
 		id: sessionId,
-		userName
+		user
 	};
 
-	await db.insert(tables.session).values(session);
+	const [result] = await db.insert(tables.session).values(session).returning();
 
-	return session;
+	return result;
 }
 
 export function deleteSessionTokenCookie(event: RequestEvent): void {
@@ -66,11 +68,9 @@ export async function validateSessionToken(token: string) {
 		return { session: null, user: null };
 	}
 
-	const { expiresAt, id, userName } = row;
+	const { expiresAt, id, user } = row;
 
 	const session = { expiresAt, id };
-
-	const user = { userName };
 
 	if (Date.now() >= session.expiresAt.getTime()) {
 		await db.delete(tables.session).where(eq(tables.session.id, session.id));
