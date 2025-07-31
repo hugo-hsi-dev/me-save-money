@@ -1,13 +1,12 @@
 import type { User } from '$lib/config';
 
-import { type RequestEvent } from '@sveltejs/kit';
 import { getRequestEvent } from '$app/server';
 import { ERRORS } from '$lib/server/errors';
 
 export class LocalsService {
-	private locals: RequestEvent['locals'];
+	private locals: App.Locals;
 
-	constructor(locals: RequestEvent['locals'] = getRequestEvent().locals) {
+	constructor(locals: App.Locals = getRequestEvent().locals) {
 		this.locals = locals;
 	}
 
