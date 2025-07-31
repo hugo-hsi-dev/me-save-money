@@ -2,7 +2,7 @@
 	import { goto } from '$app/navigation';
 	import { resolve } from '$app/paths';
 	import * as InputOTP from '$lib/components/ui/input-otp';
-	import { signIn } from '$lib/remote/auth.remote';
+	import { signIn } from '$lib/remote/session.remote';
 	import { REGEXP_ONLY_DIGITS } from 'bits-ui';
 	let value: string = $state('');
 	let isInvalid = $state(false);

@@ -3,7 +3,7 @@ import { date, index, numeric, pgEnum, pgTable, text, timestamp } from 'drizzle-
 
 export const userEnum = pgEnum('user_names', ['Hugo', 'Cassie']);
 
-export type UserName = (typeof userEnum.enumValues)[number];
+export type User = (typeof userEnum.enumValues)[number];
 
 export const session = pgTable('session', {
 	expiresAt: timestamp().notNull(),

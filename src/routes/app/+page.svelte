@@ -1,5 +1,5 @@
 <script>
-	import { getUser } from '$lib/remote/auth.remote';
+	import { getUser } from '$lib/remote/user.remote';
 </script>
 
 <svelte:boundary>
