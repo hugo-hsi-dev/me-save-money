@@ -1,27 +1,32 @@
 import type { Handle } from '@sveltejs/kit';
 
+import { CookiesService } from '$lib/server/service/cookies';
+import { DBService } from '$lib/server/service/db';
+import { LocalsService } from '$lib/server/service/locals';
 import { SessionService } from '$lib/server/service/session';
 
 export const handle: Handle = async ({ event, resolve }) => {
-	const token = event.cookies.get('session');
-	if (!token) {
-		event.locals.user = null;
-		event.locals.session = null;
+	const cookiesService = new CookiesService(event.cookies);
+	const localsService = new LocalsService(event.locals);
+	const sessionToken = cookiesService.getSessionToken();
+
+	if (!sessionToken) {
+		localsService.setSessionNull();
 		return resolve(event);
 	}
 
-	const sessionService = new SessionService();
-	const id = sessionService.getIdFromToken({ token });
-	const result = await sessionService.selectSession({ id });
+	const session = new SessionService();
+	const db = new DBService();
+
+	const sessionId = session.getIdFromToken(sessionToken);
+	const result = await db.selectOneSession(sessionId);
 
 	if (!result) {
-		sessionService.invalidateCookie(event);
-		event.locals.user = null;
-		event.locals.session = null;
+		cookiesService.invalidateSessionToken();
+		localsService.setSessionNull();
 	} else {
-		sessionService.setCookie(event, { expiresAt: result.expiresAt, token });
-		event.locals.user = result.user;
-		event.locals.session = { expiresAt: result.expiresAt, id };
+		cookiesService.setSessionToken({ expiresAt: result.expiresAt, token: sessionToken });
+		localsService.setSession({ ...result, id: sessionId });
 	}
 
 	return resolve(event);

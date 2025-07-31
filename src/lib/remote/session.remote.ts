@@ -1,7 +1,10 @@
 import { error } from '@sveltejs/kit';
-import { command, getRequestEvent } from '$app/server';
+import { command } from '$app/server';
 import { PIN } from '$env/static/private';
+import { CookiesService } from '$lib/server/service/cookies';
+import { DBService } from '$lib/server/service/db';
 import { SessionService } from '$lib/server/service/session';
+import { UserService } from '$lib/server/service/user';
 import z from 'zod';
 
 export const signIn = command(
@@ -16,17 +19,16 @@ export const signIn = command(
 		}
 
 		const sessionService = new SessionService();
+		const dbService = new DBService();
+		const cookieService = new CookiesService();
 
 		const token = sessionService.generateToken();
-		const id = sessionService.getIdFromToken({ token });
+		const id = sessionService.getIdFromToken(token);
 		const expiresAt = sessionService.generateNewExpiration();
-		const user = sessionService.getDefaultUser();
+		const user = UserService.getDefaultUser();
 
-		await sessionService.insertSession({ expiresAt, id, user });
-
-		const event = getRequestEvent();
-
-		sessionService.setCookie(event, { expiresAt, token });
+		await dbService.insertSession({ expiresAt, id, user });
+		cookieService.setSessionToken({ expiresAt, token });
 
 		return { ok: true };
 	}
