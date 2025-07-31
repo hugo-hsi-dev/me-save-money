@@ -3,8 +3,8 @@
 declare global {
 	namespace App {
 		interface Locals {
-			// session: import('$lib/server/auth').Session;
-			user: import('$lib/server/db/schema').User | null;
+			session: { expiresAt: Date; id: string };
+			user: import('$lib/config').User | null;
 		}
 		// interface Platform {}
 		// interface Error {}

@@ -1,9 +1,10 @@
 import type { RequestEvent } from '@sveltejs/kit';
+import type { User } from '$lib/config';
 
 import { sha256 } from '@oslojs/crypto/sha2';
 import { encodeBase32LowerCaseNoPadding, encodeHexLowerCase } from '@oslojs/encoding';
 import { db } from '$lib/server/db';
-import { session, type User } from '$lib/server/db/schema';
+import { session } from '$lib/server/db/schema';
 import { eq } from 'drizzle-orm';
 
 export class SessionService {

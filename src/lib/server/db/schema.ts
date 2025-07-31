@@ -1,9 +1,8 @@
+import { USER_CONFIG } from '$lib/config';
 import { type SQL, sql } from 'drizzle-orm';
 import { date, index, numeric, pgEnum, pgTable, text, timestamp } from 'drizzle-orm/pg-core';
 
-export const userEnum = pgEnum('user_names', ['Hugo', 'Cassie']);
-
-export type User = (typeof userEnum.enumValues)[number];
+export const userEnum = pgEnum('user_names', USER_CONFIG);
 
 export const session = pgTable('session', {
 	expiresAt: timestamp().notNull(),

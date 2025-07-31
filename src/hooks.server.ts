@@ -6,7 +6,7 @@ export const handle: Handle = async ({ event, resolve }) => {
 	const token = event.cookies.get('session');
 	if (!token) {
 		event.locals.user = null;
-		// event.locals.session = null;
+		event.locals.session = null;
 		return resolve(event);
 	}
 
@@ -17,11 +17,11 @@ export const handle: Handle = async ({ event, resolve }) => {
 	if (!result) {
 		sessionService.invalidateCookie(event);
 		event.locals.user = null;
-		// event.locals.session = null;
+		event.locals.session = null;
 	} else {
 		sessionService.setCookie(event, { expiresAt: result.expiresAt, token });
 		event.locals.user = result.user;
-		// event.locals.session = { expiresAt: result.expiresAt, id };
+		event.locals.session = { expiresAt: result.expiresAt, id };
 	}
 
 	return resolve(event);
