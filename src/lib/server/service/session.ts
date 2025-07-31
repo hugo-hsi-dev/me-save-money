@@ -2,19 +2,13 @@ import type { RequestEvent } from '@sveltejs/kit';
 
 import { sha256 } from '@oslojs/crypto/sha2';
 import { encodeBase32LowerCaseNoPadding, encodeHexLowerCase } from '@oslojs/encoding';
-import { type DB, db as dbClient } from '$lib/server/db';
+import { db } from '$lib/server/db';
 import { session, type User } from '$lib/server/db/schema';
 import { eq } from 'drizzle-orm';
 
 export class SessionService {
-	#db: DB;
-
-	constructor({ db }: { db?: DB } = {}) {
-		this.#db = db ?? dbClient;
-	}
-
 	async deleteSession({ id }: { id: string }) {
-		await this.#db.delete(session).where(eq(session.id, id));
+		await db.delete(session).where(eq(session.id, id));
 		return this;
 	}
 
@@ -43,7 +37,7 @@ export class SessionService {
 			id,
 			user
 		};
-		await this.#db.insert(session).values(data);
+		await db.insert(session).values(data);
 		return this;
 	}
 
@@ -59,7 +53,7 @@ export class SessionService {
 	}
 
 	async selectSession({ id }: { id: string }) {
-		const result = await this.#db
+		const result = await db
 			.select({ expiresAt: session.expiresAt, user: session.user })
 			.from(session)
 			.where(eq(session.id, id))
@@ -84,7 +78,7 @@ export class SessionService {
 	}
 
 	async updateSession({ expiresAt, id, user }: { expiresAt?: Date; id: string; user?: User }) {
-		await this.#db.update(session).set({ expiresAt, user }).where(eq(session.id, id));
+		await db.update(session).set({ expiresAt, user }).where(eq(session.id, id));
 		return this;
 	}
 
