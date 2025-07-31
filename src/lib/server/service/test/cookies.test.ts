@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import type { Cookies } from '@sveltejs/kit';
 
 import { beforeEach, describe, expect, it } from 'vitest';
@@ -6,7 +7,7 @@ import { CookiesService } from '../cookies';
 
 // Mock implementation of SvelteKit's Cookies interface
 class MockCookies implements Cookies {
-	private options = new Map<string, unknown>();
+	private options = new Map<string, any>();
 	private store = new Map<string, string>();
 
 	clear(): void {
@@ -40,7 +41,7 @@ class MockCookies implements Cookies {
 		return `${name}=${value}`;
 	}
 
-	set(name: string, value: string, opts?: unknown): void {
+	set(name: string, value: string, opts?: any): void {
 		this.store.set(name, value);
 		this.options.set(name, opts);
 	}
