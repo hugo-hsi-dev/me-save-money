@@ -1,11 +1,12 @@
 <script lang="ts">
-	import type { HTMLAttributes } from "svelte/elements";
-	import type { WithElementRef } from "$lib/utils.js";
-	import DotIcon from "@lucide/svelte/icons/dot";
+	import type { WithElementRef } from '$lib/utils.js';
+	import type { HTMLAttributes } from 'svelte/elements';
+
+	import DotIcon from '@lucide/svelte/icons/dot';
 
 	let {
-		ref = $bindable(null),
 		children,
+		ref = $bindable(null),
 		...restProps
 	}: WithElementRef<HTMLAttributes<HTMLDivElement>> = $props();
 </script>
