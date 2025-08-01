@@ -1,6 +1,7 @@
-import { USER_CONFIG } from '$lib/config';
 import { type SQL, sql } from 'drizzle-orm';
 import { date, index, numeric, pgEnum, pgTable, text, timestamp } from 'drizzle-orm/pg-core';
+
+import { USER_CONFIG } from '../../config';
 
 export const userEnum = pgEnum('user_names', USER_CONFIG);
 
