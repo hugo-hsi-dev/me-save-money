@@ -2,6 +2,10 @@ import { sha256 } from '@oslojs/crypto/sha2';
 import { encodeBase32LowerCaseNoPadding, encodeHexLowerCase } from '@oslojs/encoding';
 
 export class SessionService {
+	checkIsExpired(expiresAt: Date) {
+		return Date.now() >= expiresAt.getTime();
+	}
+
 	generateNewExpiration() {
 		return new Date(Date.now() + 60 * 60 * 24 * 30);
 	}
@@ -15,9 +19,5 @@ export class SessionService {
 
 	getIdFromToken(token: string) {
 		return encodeHexLowerCase(sha256(new TextEncoder().encode(token)));
-	}
-
-	validateExpiration({ expiresAt }: { expiresAt: Date }) {
-		return Date.now() >= expiresAt.getTime();
 	}
 }

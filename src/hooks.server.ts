@@ -15,19 +15,34 @@ export const handle: Handle = async ({ event, resolve }) => {
 		return resolve(event);
 	}
 
-	const session = new SessionService();
-	const db = new DBService();
+	const sessionService = new SessionService();
+	const dbService = new DBService();
 
-	const sessionId = session.getIdFromToken(sessionToken);
-	const result = await db.selectOneSession(sessionId);
+	const sessionId = sessionService.getIdFromToken(sessionToken);
+	const session = await dbService.selectOneSession(sessionId);
 
-	if (!result) {
+	if (!session) {
 		cookiesService.invalidateSessionToken();
 		localsService.setSessionNull();
-	} else {
-		cookiesService.setSessionToken({ expiresAt: result.expiresAt, token: sessionToken });
-		localsService.setSession({ ...result, id: sessionId });
+		return resolve(event);
 	}
 
+	const isExpired = sessionService.checkIsExpired(session.expiresAt);
+
+	if (isExpired) {
+		cookiesService.invalidateSessionToken();
+		localsService.setSessionNull();
+		await dbService.deleteSession(sessionId);
+		return resolve(event);
+	}
+
+	const newExpiresAt = sessionService.generateNewExpiration();
+
+	cookiesService.setSessionToken({
+		expiresAt: newExpiresAt,
+		token: sessionToken
+	});
+	localsService.setSession({ ...session, id: sessionId });
+	dbService.updateSessionById({ expiresAt: newExpiresAt, id: sessionId });
 	return resolve(event);
 };
