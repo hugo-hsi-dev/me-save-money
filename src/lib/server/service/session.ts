@@ -7,7 +7,7 @@ export class SessionService {
 	}
 
 	generateNewExpiration() {
-		return new Date(Date.now() + 60 * 60 * 24 * 30);
+		return new Date(Date.now() + 1000 * 60 * 60 * 24 * 30);
 	}
 
 	generateNewToken(): string {
