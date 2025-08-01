@@ -7,8 +7,8 @@ on:
   pull_request:
 
 env:
-  DATABASE_URL: ${{env.DATABASE_URL}}
-  PIN: ${{env.PIN}}
+  DATABASE_URL: ${{vars.DATABASE_URL}}
+  PIN: ${{vars.PIN}}
 
 # cancel in-progress runs on new commits to same PR (gitub.event.number)
 concurrency:
