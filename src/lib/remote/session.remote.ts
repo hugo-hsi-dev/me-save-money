@@ -27,8 +27,8 @@ export const signIn = command(
 		const expiresAt = sessionService.generateNewExpiration();
 		const user = UserService.getDefaultUser();
 
-		await dbService.insertSession({ expiresAt, id, user });
 		cookieService.setSessionToken({ expiresAt, token });
+		await dbService.insertSession({ expiresAt, id, user });
 
 		return { ok: true };
 	}

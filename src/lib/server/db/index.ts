@@ -5,4 +5,4 @@ import * as schema from './schema';
 
 export const db = drizzle(DATABASE_URL, { casing: 'snake_case', schema });
 
-export type DB = typeof db;
+export type DBClient = typeof db;

@@ -1,20 +1,13 @@
 import type { User } from '$lib/config';
 
-import { DATABASE_URL } from '$env/static/private';
+import { db, type DBClient } from '$lib/server/db';
 import * as table from '$lib/server/db/schema';
 import { eq } from 'drizzle-orm';
-import { drizzle, type NodePgClient, NodePgDatabase } from 'drizzle-orm/node-postgres';
-
-type DBClient = {
-	$client: NodePgClient;
-} & NodePgDatabase<typeof table>;
 
 export class DBService {
 	private db: DBClient;
-	constructor(
-		db: DBClient = drizzle(DATABASE_URL, { casing: 'snake_case', logger: true, schema: table })
-	) {
-		this.db = db;
+	constructor(dbClient: DBClient = db) {
+		this.db = dbClient;
 	}
 
 	async deleteSession(id: string) {
