@@ -14,6 +14,7 @@
 			throw e;
 		}
 		if (e.status === 401) {
+			console.log('this ran');
 			throw e;
 		}
 	}}
