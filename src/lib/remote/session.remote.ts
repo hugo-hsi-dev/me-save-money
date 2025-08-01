@@ -22,7 +22,7 @@ export const signIn = command(
 		const dbService = new DBService();
 		const cookieService = new CookiesService();
 
-		const token = sessionService.generateToken();
+		const token = sessionService.generateNewToken();
 		const id = sessionService.getIdFromToken(token);
 		const expiresAt = sessionService.generateNewExpiration();
 		const user = UserService.getDefaultUser();
