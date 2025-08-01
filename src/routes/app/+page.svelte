@@ -1,29 +1,31 @@
 <script lang="ts">
-	import type { User } from '$lib/config';
-
-	import * as Select from '$lib/components/ui/select/index.js';
-	import { USER_CONFIG } from '$lib/config';
-	import { changeUser, getUser } from '$lib/remote/user.remote';
+	import { isHttpError } from '@sveltejs/kit';
+	import { resolve } from '$app/paths';
+	import { Button } from '$lib/components/ui/button';
 </script>
 
 <svelte:boundary>
-	<Select.Root
-		type="single"
-		value={await getUser()}
-		onValueChange={async (newValue) => {
-			await changeUser({ user: newValue as User }).updates(
-				getUser().withOverride(() => newValue as User)
-			);
-		}}
-	>
-		<Select.Trigger class="w-[180px]">{await getUser()}</Select.Trigger>
-		<Select.Content>
-			{#each USER_CONFIG as user, index (index)}
-				<Select.Item value={user}>{user}</Select.Item>
-			{/each}
-		</Select.Content>
-	</Select.Root>
-	{#snippet pending()}
-		loading...
+	{#snippet failed(error, reset)}
+		{#if isHttpError(error)}
+			<div class="h-dvh w-screen p-12">
+				<div class="flex h-full flex-col justify-center gap-6 rounded-3xl border border-dashed p-6">
+					<span class="text-3xl font-bold">
+						{error.body.message}
+					</span>
+					{#if error.status === 401}
+						<Button class="w-fit" href={resolve('/')}>Sign In</Button>
+					{:else}
+						<Button class="w-fit" onclick={reset}>Try Again</Button>
+					{/if}
+				</div>
+			</div>
+		{:else}
+			<div class="h-dvh w-screen p-12">
+				<div class="flex h-full flex-col justify-center gap-6 rounded-3xl border border-dashed p-6">
+					<span class="text-3xl font-bold"> An unknown error has occured </span>
+					<Button class="w-fit" onclick={reset}>Try Again</Button>
+				</div>
+			</div>
+		{/if}
 	{/snippet}
 </svelte:boundary>
