@@ -1,20 +1,45 @@
-import { integer, pgTable, text, timestamp } from 'drizzle-orm/pg-core';
+import { type SQL, sql } from 'drizzle-orm';
+import { date, index, numeric, pgEnum, pgTable, text, timestamp } from 'drizzle-orm/pg-core';
 
-export const user = pgTable('user', {
-	age: integer('age'),
-	id: text('id').primaryKey(),
-	passwordHash: text('password_hash').notNull(),
-	username: text('username').notNull().unique()
-});
+import { USER_CONFIG } from '../../config';
+
+export const userEnum = pgEnum('user_names', USER_CONFIG);
 
 export const session = pgTable('session', {
-	expiresAt: timestamp('expires_at', { mode: 'date', withTimezone: true }).notNull(),
-	id: text('id').primaryKey(),
-	userId: text('user_id')
-		.notNull()
-		.references(() => user.id)
+	expiresAt: timestamp().notNull(),
+	id: text().primaryKey(),
+	user: userEnum().notNull()
 });
 
-export type Session = typeof session.$inferSelect;
+export const transaction = pgTable(
+	'transactions',
+	{
+		amount: numeric({ precision: 12, scale: 2 }).notNull(),
+		createdAt: timestamp().defaultNow().notNull(),
+		forWeek: date({ mode: 'date' })
+			.generatedAlwaysAs((): SQL => sql<Date>`DATE_TRUNC('week', ${transaction.paidAt})`)
+			.notNull(),
+		id: text().primaryKey(),
+		name: text().notNull(),
+		paidAt: timestamp().notNull(),
+		updatedAt: timestamp().$onUpdate(() => new Date()),
+		user: text().notNull()
+	},
+	(table) => [index('transactions_for_week_idx').on(table.forWeek)]
+);
 
-export type User = typeof user.$inferSelect;
+export const preset = pgTable('presets', {
+	amount: numeric({ precision: 12, scale: 2 }),
+	createdAt: timestamp().defaultNow().notNull(),
+	id: text().primaryKey(),
+	name: text().notNull(),
+	updatedAt: timestamp()
+});
+
+export const budget = pgTable('budget', {
+	amount: numeric({ precision: 12, scale: 2 }).notNull(),
+	appliesTo: date({ mode: 'date' }).notNull(),
+	createdAt: timestamp().defaultNow().notNull(),
+	id: text().primaryKey(),
+	updatedAt: timestamp()
+});

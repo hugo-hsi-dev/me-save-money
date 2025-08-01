@@ -1,27 +1,48 @@
 import type { Handle } from '@sveltejs/kit';
 
-import * as auth from '$lib/server/auth';
+import { CookiesService } from '$lib/server/service/cookies';
+import { DBService } from '$lib/server/service/db';
+import { LocalsService } from '$lib/server/service/locals';
+import { SessionService } from '$lib/server/service/session';
 
-const handleAuth: Handle = async ({ event, resolve }) => {
-	const sessionToken = event.cookies.get(auth.sessionCookieName);
+export const handle: Handle = async ({ event, resolve }) => {
+	const cookiesService = new CookiesService(event.cookies);
+	const localsService = new LocalsService(event.locals);
+	const sessionToken = cookiesService.getSessionToken();
 
 	if (!sessionToken) {
-		event.locals.user = null;
-		event.locals.session = null;
+		localsService.setSessionNull();
 		return resolve(event);
 	}
 
-	const { session, user } = await auth.validateSessionToken(sessionToken);
+	const sessionService = new SessionService();
+	const dbService = new DBService();
 
-	if (session) {
-		auth.setSessionTokenCookie(event, sessionToken, session.expiresAt);
-	} else {
-		auth.deleteSessionTokenCookie(event);
+	const sessionId = sessionService.getIdFromToken(sessionToken);
+	const session = await dbService.selectOneSession(sessionId);
+
+	if (!session) {
+		cookiesService.invalidateSessionToken();
+		localsService.setSessionNull();
+		return resolve(event);
 	}
 
-	event.locals.user = user;
-	event.locals.session = session;
+	const isExpired = sessionService.checkIsExpired(session.expiresAt);
+
+	if (isExpired) {
+		cookiesService.invalidateSessionToken();
+		localsService.setSessionNull();
+		await dbService.deleteSession(sessionId);
+		return resolve(event);
+	}
+
+	const newExpiresAt = sessionService.generateNewExpiration();
+
+	cookiesService.setSessionToken({
+		expiresAt: newExpiresAt,
+		token: sessionToken
+	});
+	localsService.setSession({ ...session, id: sessionId });
+	dbService.updateSessionById({ expiresAt: newExpiresAt, id: sessionId });
 	return resolve(event);
 };
-
-export const handle: Handle = handleAuth;
