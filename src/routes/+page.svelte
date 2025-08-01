@@ -1,33 +1,28 @@
-<script lang="ts">
-	import { goto } from '$app/navigation';
+<script>
 	import { resolve } from '$app/paths';
-	import * as InputOTP from '$lib/components/ui/input-otp';
-	import { signIn } from '$lib/remote/session.remote';
-	import { REGEXP_ONLY_DIGITS } from 'bits-ui';
-	let value: string = $state('');
-	let isInvalid = $state(false);
+	import SignInInput from '$lib/components/sign-in-input.svelte';
+	import { Button } from '$lib/components/ui/button';
+	import { Separator } from '$lib/components/ui/separator';
 </script>
 
-<InputOTP.Root
-	bind:value
-	maxlength={6}
-	pattern={REGEXP_ONLY_DIGITS}
-	onComplete={async () => {
-		try {
-			const result = await signIn({ pin: value });
-			if (result.ok) {
-				goto(resolve('/app'));
-			}
-		} catch {
-			isInvalid = true;
-		}
-	}}
->
-	{#snippet children({ cells })}
-		<InputOTP.Group>
-			{#each cells as cell, index (index)}
-				<InputOTP.Slot aria-invalid={isInvalid} {cell} />
-			{/each}
-		</InputOTP.Group>
-	{/snippet}
-</InputOTP.Root>
+<div class="flex h-dvh w-screen flex-col items-center justify-center gap-12 bg-background p-12">
+	<div class="flex w-full max-w-md flex-col items-center gap-6">
+		<div class="flex flex-col gap-6">
+			<div class="flex flex-col gap-4">
+				<div>
+					<h1 class="text-2xl leading-6 font-semibold tracking-tight">Sign in with PIN</h1>
+					<p class="mt-2 text-sm text-muted-foreground">Enter your PIN to access your account</p>
+				</div>
+				<SignInInput />
+			</div>
+
+			<div class="flex items-center gap-6">
+				<Separator class="flex-1" />
+				<span class="text-xs text-muted-foreground"> Or </span>
+				<Separator class="flex-1" />
+			</div>
+
+			<Button variant="outline" size="lg" href={resolve('/demo')}>View Demo</Button>
+		</div>
+	</div>
+</div>
