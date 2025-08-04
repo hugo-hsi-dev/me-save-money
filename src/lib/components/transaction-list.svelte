@@ -1,6 +1,8 @@
 <script lang="ts">
+	import { getLocalTimeZone } from '@internationalized/date';
 	import * as Card from '$lib/components/ui/card';
 	import { getTransactionByWeek } from '$lib/remote/transaction.remote';
+	import { getSelectedWeek } from '$lib/state/selected-week.svelte';
 
 	import { Badge } from './ui/badge';
 	import { Skeleton } from './ui/skeleton';
@@ -12,11 +14,13 @@
 		paidAt: Date;
 		user: string;
 	};
+
+	const selectedWeek = getSelectedWeek();
 </script>
 
 <svelte:boundary>
 	<ul class="flex flex-col gap-2">
-		{#each await getTransactionByWeek(new Date()) as transaction (transaction.id)}
+		{#each await getTransactionByWeek(selectedWeek.from.toDate(getLocalTimeZone())) as transaction (transaction.id)}
 			{@render card(transaction)}
 		{/each}
 	</ul>

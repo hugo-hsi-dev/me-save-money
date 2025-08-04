@@ -11,12 +11,14 @@
 	import { Button } from '$lib/components/ui/button';
 	import * as Popover from '$lib/components/ui/popover';
 	import { getAmountSpentPerWeek } from '$lib/remote/transaction.remote';
+	import { getSelectedWeek } from '$lib/state/selected-week.svelte';
 	import { cn } from '$lib/utils.js';
+
+	import { Skeleton } from './ui/skeleton';
 
 	let open = $state(false);
 
-	let selectedFrom = $derived(page.url.searchParams.get('from'));
-	let selectedTo = $derived(page.url.searchParams.get('to'));
+	const selectedWeek = getSelectedWeek();
 </script>
 
 <Popover.Root bind:open>
@@ -84,10 +86,7 @@
 										<span
 											class={{
 												'text-primary':
-													selectedFrom &&
-													selectedTo &&
-													parseDate(selectedFrom).compare(from) === 0 &&
-													parseDate(selectedTo).compare(to) === 0
+													selectedWeek.from.compare(from) === 0 && selectedWeek.to.compare(to) === 0
 											}}
 										>
 											{#if startOfWeek(today(getLocalTimeZone()), getLocalTimeZone(), 'mon').compare(from) === 0 && endOfWeek(today(getLocalTimeZone()), getLocalTimeZone(), 'mon').compare(to) === 0}
@@ -111,7 +110,14 @@
 						</div>
 					{/each}
 					{#snippet pending()}
-						loading...
+						<div class="flex flex-col gap-4">
+							<Skeleton class="h-[20px]" />
+							<div class="flex flex-col gap-3">
+								{#each { length: 5 }}
+									<Skeleton class="h-[32px]" />
+								{/each}
+							</div>
+						</div>
 					{/snippet}
 				</svelte:boundary>
 			</div>
