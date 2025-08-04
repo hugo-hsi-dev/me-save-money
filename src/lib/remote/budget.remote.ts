@@ -7,22 +7,23 @@ export const getBudgets = query(async () => {
 	return dbService.getBudgets();
 });
 
-export const getBudgetByDate = query(z.date(), async (data) => {
+export const getBudgetByDate = query(z.date(), async (date) => {
 	const dbService = new DBService();
-	return dbService.getBudget();
+	return dbService.getBudgetByDate(date);
 });
 
 export const changeBudget = command(
-	z.object({ amount: z.string(), id: z.string(), name: z.string() }),
-	async ({ amount, id, name }) => {
+	z.object({ amount: z.string(), id: z.number()}),
+	async ({ amount, id }) => {
 		const dbService = new DBService();
-		await dbService.updatePreset({ amount, id, name });
-		await getPresets().refresh();
+		const budget = await dbService.updateBudget({ amount, id });
+		await getBudgets().refresh();
+		await getBudgetByDate(budget[0].appliesTo);
 	}
 );
 
 export const deleteBudget = command(z.object({ id: z.string() }), async ({ id }) => {
 	const dbService = new DBService();
 	await dbService.deletePreset(id);
-	await getPresets().refresh();
+	await getBudgets().refresh();
 });
