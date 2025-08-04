@@ -1,7 +1,5 @@
 // place files you want to import through the `$lib` alias in this folder.
 
-import { page } from '$app/state';
-
 export function formatRelativeDate(timestamp: string): string {
 	const now = Date.now();
 	const date = new Date(timestamp);

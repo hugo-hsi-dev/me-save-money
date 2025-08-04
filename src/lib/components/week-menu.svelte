@@ -3,11 +3,9 @@
 		CalendarDate,
 		endOfWeek,
 		getLocalTimeZone,
-		parseDate,
 		startOfWeek,
 		today
 	} from '@internationalized/date';
-	import { page } from '$app/state';
 	import { Button } from '$lib/components/ui/button';
 	import * as Popover from '$lib/components/ui/popover';
 	import { getAmountSpentPerWeek } from '$lib/remote/transaction.remote';
