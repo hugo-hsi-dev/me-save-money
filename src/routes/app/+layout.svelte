@@ -10,7 +10,7 @@
 </script>
 
 <svelte:head>
-	<link rel="manifest" href={asset('/manifest.json')} />
+	<link rel="manifest" href={asset('/manifest-app.json')} />
 </svelte:head>
 
 <svelte:boundary onerror={(e) => console.error(e)}>
