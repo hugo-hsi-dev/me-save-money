@@ -84,7 +84,9 @@ export class DBService {
 	}
 
 	async selectPresets() {
-		return await this.db.select().from(table.preset);
+		return await this.db
+			.select({ amount: table.preset.amount, id: table.preset.id, name: table.preset.name })
+			.from(table.preset);
 	}
 
 	async selectTransactionsByForWeek(week: Date) {
