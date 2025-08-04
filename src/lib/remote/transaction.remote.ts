@@ -1,19 +1,13 @@
-import { form } from '$app/server';
+import { form, query } from '$app/server';
+import { addTransactionSchema } from '$lib/components/add-transaction-form.svelte';
 import { ERRORS } from '$lib/server/errors';
 import { DBService } from '$lib/server/service/db';
 import { LocalsService } from '$lib/server/service/locals';
 import z from 'zod';
 
-const schema = z.object({
-	amount: z.string().refine((amount) => !isNaN(Number(amount))),
-	id: z.nanoid(),
-	name: z.string(),
-	paidAt: z.string().transform((input) => new Date(input))
-});
-
 export const createNewTransaction = form(async (formData) => {
 	const rawData = Object.fromEntries(formData.entries());
-	const result = schema.safeParse(rawData);
+	const result = addTransactionSchema.safeParse(rawData);
 
 	if (!result.success) {
 		return ERRORS.INTERNAL_SERVER_ERROR;
@@ -23,4 +17,10 @@ export const createNewTransaction = form(async (formData) => {
 	const localsService = new LocalsService();
 
 	await dbService.insertTransaction({ ...result.data, user: localsService.validateSession().user });
+});
+
+export const getTransactionByWeek = query(z.date(), async (date) => {
+	const dbService = new DBService();
+	const data = await dbService.selectTransactionsByForWeek(date);
+	return data;
 });
