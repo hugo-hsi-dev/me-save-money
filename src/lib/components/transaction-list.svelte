@@ -3,6 +3,7 @@
 	import { getTransactionByWeek } from '$lib/remote/transaction.remote';
 
 	import { Badge } from './ui/badge';
+	import { Skeleton } from './ui/skeleton';
 
 	type Transaction = {
 		amount: string;
@@ -20,7 +21,13 @@
 		{/each}
 	</ul>
 	{#snippet pending()}
-		loading...
+		<ul class="flex flex-col gap-2">
+			{#each { length: 3 }}
+				<li>
+					<Skeleton class="h-[178px] rounded-xl" />
+				</li>
+			{/each}
+		</ul>
 	{/snippet}
 </svelte:boundary>
 
