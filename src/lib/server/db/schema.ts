@@ -1,5 +1,6 @@
 import { type SQL, sql } from 'drizzle-orm';
 import { date, index, numeric, pgEnum, pgTable, text, timestamp } from 'drizzle-orm/pg-core';
+import { nanoid } from 'nanoid';
 
 import { USER_CONFIG } from '../../config';
 
@@ -31,15 +32,19 @@ export const transaction = pgTable(
 export const preset = pgTable('presets', {
 	amount: numeric({ precision: 12, scale: 2 }),
 	createdAt: timestamp().defaultNow().notNull(),
-	id: text().primaryKey(),
+	id: text().primaryKey().default(nanoid()),
 	name: text().notNull(),
 	updatedAt: timestamp()
+		.defaultNow()
+		.$onUpdate(() => new Date())
 });
 
 export const budget = pgTable('budget', {
 	amount: numeric({ precision: 12, scale: 2 }).notNull(),
 	appliesTo: date({ mode: 'date' }).notNull(),
 	createdAt: timestamp().defaultNow().notNull(),
-	id: text().primaryKey(),
+	id: text().primaryKey().default(nanoid()),
 	updatedAt: timestamp()
+		.defaultNow()
+		.$onUpdate(() => new Date())
 });

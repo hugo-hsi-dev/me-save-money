@@ -5,7 +5,7 @@ export function formatRelativeDate(timestamp: string): string {
 	const date = new Date(timestamp);
 	const diff = Math.floor((now - date.getTime()) / 1000);
 
-	if (diff < 60) return diff <= 1 ? '1 second ago' : `${diff} seconds ago`;
+	if (diff < 60) return diff <= 10 ? 'few moments ago' : `${diff} seconds ago`;
 
 	const minutes = Math.floor(diff / 60);
 	if (minutes < 60) return minutes === 1 ? '1 minute ago' : `${minutes} minutes ago`;
