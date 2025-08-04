@@ -1,66 +1,17 @@
 <script lang="ts">
-	import type { HTMLAnchorAttributes } from 'svelte/elements';
-
-	import { CalendarDate, endOfWeek, getLocalTimeZone, startOfWeek } from '@internationalized/date';
-	import { Button, type ButtonProps } from '$lib/components/ui/button';
+	import {
+		CalendarDate,
+		endOfWeek,
+		getLocalTimeZone,
+		startOfWeek,
+		today
+	} from '@internationalized/date';
+	import { Button } from '$lib/components/ui/button';
 	import * as Popover from '$lib/components/ui/popover';
 	import { getAmountSpentPerWeek } from '$lib/remote/transaction.remote';
 	import { cn } from '$lib/utils.js';
 
-	type MobileLinkProps = {
-		content?: string;
-	} & HTMLAnchorAttributes;
-
-	let { class: className, ...restProps }: ButtonProps = $props();
-
 	let open = $state(false);
-
-	const seed = [
-		{
-			weeks: [
-				{
-					href: '?week=asdf',
-					startOfWeek: '1234'
-				},
-				{
-					href: '?settings=user',
-					startOfWeek: 'User Settings'
-				},
-				{
-					href: '?month=xyz',
-					startOfWeek: 'Monthly Report'
-				}
-			],
-			year: 'asdf'
-		},
-		{
-			weeks: [
-				{
-					href: '?month=xyz',
-					startOfWeek: 'Monthly Report'
-				}
-			],
-			year: 'Reports'
-		},
-		{
-			weeks: [
-				{
-					href: '?dashboard=main',
-					startOfWeek: 'Overview'
-				}
-			],
-			year: 'Dashboard'
-		},
-		{
-			weeks: [
-				{
-					href: '?settings=user',
-					startOfWeek: 'User Settings'
-				}
-			],
-			year: 'Settings'
-		}
-	];
 </script>
 
 <Popover.Root bind:open>
@@ -68,12 +19,8 @@
 		{#snippet child({ props })}
 			<Button
 				{...props}
-				{...restProps}
 				variant="ghost"
-				class={cn(
-					'extend-touch-target h-8 touch-manipulation items-center justify-start gap-2.5 !p-0 hover:bg-transparent focus-visible:bg-transparent focus-visible:ring-0 active:bg-transparent dark:hover:bg-transparent',
-					className
-				)}
+				class="extend-touch-target h-8 touch-manipulation items-center justify-start gap-2.5 !p-0 hover:bg-transparent focus-visible:bg-transparent focus-visible:ring-0 active:bg-transparent dark:hover:bg-transparent"
 			>
 				<div class="relative flex h-8 w-4 items-center justify-center">
 					<div class="relative size-4">
@@ -120,21 +67,31 @@
 										week.week.getUTCDate()
 									)}
 									{@const middleOfWeek = calendarDate.add({ days: 4 })}
+									{@const from = startOfWeek(middleOfWeek, getLocalTimeZone(), 'mon')}
+									{@const to = endOfWeek(middleOfWeek, getLocalTimeZone(), 'mon')}
 									<a
-										href="/"
+										href="?from={from.toString()}&to={to.toString()}"
 										onclick={() => {
 											open = false;
 										}}
-										class={cn('flex items-center justify-between text-2xl font-medium', className)}
+										class="flex items-center justify-between text-2xl font-medium"
 									>
-										<span>
-											{startOfWeek(middleOfWeek, getLocalTimeZone(), 'mon')
-												.toDate(getLocalTimeZone())
-												.toLocaleDateString('en-US', { day: '2-digit', month: 'short' })}
-											-
-											{endOfWeek(middleOfWeek, getLocalTimeZone(), 'mon')
-												.toDate(getLocalTimeZone())
-												.toLocaleDateString('en-US', { day: '2-digit', month: 'short' })}
+										<span
+											class={{
+												'text-primary': true
+											}}
+										>
+											{#if startOfWeek(today(getLocalTimeZone()), getLocalTimeZone(), 'mon').compare(from) === 0 && endOfWeek(today(getLocalTimeZone()), getLocalTimeZone(), 'mon').compare(to) === 0}
+												Current
+											{:else}
+												{from
+													.toDate(getLocalTimeZone())
+													.toLocaleDateString('en-US', { day: '2-digit', month: 'short' })}
+												-
+												{to
+													.toDate(getLocalTimeZone())
+													.toLocaleDateString('en-US', { day: '2-digit', month: 'short' })}
+											{/if}
 										</span>
 										<span class="text-lg text-muted-foreground">
 											${week.amount}
