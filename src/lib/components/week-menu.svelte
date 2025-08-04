@@ -1,90 +1,31 @@
 <script lang="ts">
-	import type { HTMLAnchorAttributes } from 'svelte/elements';
-
-	import { Button, type ButtonProps } from '$lib/components/ui/button';
+	import {
+		CalendarDate,
+		endOfWeek,
+		getLocalTimeZone,
+		startOfWeek,
+		today
+	} from '@internationalized/date';
+	import { Button } from '$lib/components/ui/button';
 	import * as Popover from '$lib/components/ui/popover';
+	import { getAmountSpentPerWeek } from '$lib/remote/transaction.remote';
+	import { getSelectedWeek } from '$lib/state/selected-week.svelte';
 	import { cn } from '$lib/utils.js';
 
-	type MobileLinkProps = {
-		content?: string;
-	} & HTMLAnchorAttributes;
-
-	let { class: className, ...restProps }: ButtonProps = $props();
+	import { Skeleton } from './ui/skeleton';
 
 	let open = $state(false);
 
-	const seed = [
-		{
-			weeks: [
-				{
-					href: '?week=asdf',
-					startOfWeek: '1234'
-				},
-				{
-					href: '?settings=user',
-					startOfWeek: 'User Settings'
-				},
-				{
-					href: '?month=xyz',
-					startOfWeek: 'Monthly Report'
-				}
-			],
-			year: 'asdf'
-		},
-		{
-			weeks: [
-				{
-					href: '?month=xyz',
-					startOfWeek: 'Monthly Report'
-				}
-			],
-			year: 'Reports'
-		},
-		{
-			weeks: [
-				{
-					href: '?dashboard=main',
-					startOfWeek: 'Overview'
-				}
-			],
-			year: 'Dashboard'
-		},
-		{
-			weeks: [
-				{
-					href: '?settings=user',
-					startOfWeek: 'User Settings'
-				}
-			],
-			year: 'Settings'
-		}
-	];
+	const selectedWeek = getSelectedWeek();
 </script>
-
-{#snippet MobileLink({ class: className, content, href, ...props }: MobileLinkProps)}
-	<a
-		{href}
-		onclick={() => {
-			open = false;
-		}}
-		class={cn('text-2xl font-medium', className)}
-		{...props}
-	>
-		{content}
-	</a>
-{/snippet}
 
 <Popover.Root bind:open>
 	<Popover.Trigger>
 		{#snippet child({ props })}
 			<Button
 				{...props}
-				{...restProps}
 				variant="ghost"
-				class={cn(
-					'extend-touch-target h-8 touch-manipulation items-center justify-start gap-2.5 !p-0 hover:bg-transparent focus-visible:bg-transparent focus-visible:ring-0 active:bg-transparent dark:hover:bg-transparent',
-					className
-				)}
+				class="extend-touch-target h-8 touch-manipulation items-center justify-start gap-2.5 !p-0 hover:bg-transparent focus-visible:bg-transparent focus-visible:ring-0 active:bg-transparent dark:hover:bg-transparent"
 			>
 				<div class="relative flex h-8 w-4 items-center justify-center">
 					<div class="relative size-4">
@@ -117,18 +58,66 @@
 	>
 		<div class="flex flex-col gap-12 overflow-auto px-6 py-6">
 			<div class="flex flex-col gap-8">
-				{#each seed as years (years.year)}
-					<div class="flex flex-col gap-4">
-						<div class="text-sm font-medium text-muted-foreground">
-							{years.year}
+				<svelte:boundary>
+					{#each await getAmountSpentPerWeek(getLocalTimeZone()) as years (years.year)}
+						<div class="flex flex-col gap-4">
+							<div class="text-sm font-medium text-muted-foreground">
+								{years.year}
+							</div>
+							<div class="flex flex-col gap-3">
+								{#each years.weeks as week, i (i)}
+									{@const calendarDate = new CalendarDate(
+										week.week.getUTCFullYear(),
+										week.week.getUTCMonth() + 1,
+										week.week.getUTCDate()
+									)}
+									{@const middleOfWeek = calendarDate.add({ days: 4 })}
+									{@const from = startOfWeek(middleOfWeek, getLocalTimeZone(), 'mon')}
+									{@const to = endOfWeek(middleOfWeek, getLocalTimeZone(), 'mon')}
+									<a
+										href="?from={from.toString()}&to={to.toString()}"
+										onclick={() => {
+											open = false;
+										}}
+										class="flex items-center justify-between text-2xl font-medium"
+									>
+										<span
+											class={{
+												'text-primary':
+													selectedWeek.from.compare(from) === 0 && selectedWeek.to.compare(to) === 0
+											}}
+										>
+											{#if startOfWeek(today(getLocalTimeZone()), getLocalTimeZone(), 'mon').compare(from) === 0 && endOfWeek(today(getLocalTimeZone()), getLocalTimeZone(), 'mon').compare(to) === 0}
+												Current
+											{:else}
+												{from
+													.toDate(getLocalTimeZone())
+													.toLocaleDateString('en-US', { day: '2-digit', month: 'short' })}
+												-
+												{to
+													.toDate(getLocalTimeZone())
+													.toLocaleDateString('en-US', { day: '2-digit', month: 'short' })}
+											{/if}
+										</span>
+										<span class="text-lg text-muted-foreground">
+											${week.amount}
+										</span>
+									</a>
+								{/each}
+							</div>
 						</div>
-						<div class="flex flex-col gap-3">
-							{#each years.weeks as week, i (i)}
-								{@render MobileLink({ content: week.startOfWeek, href: week.href })}
-							{/each}
+					{/each}
+					{#snippet pending()}
+						<div class="flex flex-col gap-4">
+							<Skeleton class="h-[20px]" />
+							<div class="flex flex-col gap-3">
+								{#each { length: 5 }}
+									<Skeleton class="h-[32px]" />
+								{/each}
+							</div>
 						</div>
-					</div>
-				{/each}
+					{/snippet}
+				</svelte:boundary>
 			</div>
 		</div>
 	</Popover.Content>

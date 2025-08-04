@@ -33,6 +33,7 @@ export function formatRelativeDate(timestamp: string): string {
 
 	return `${months[date.getMonth()]} ${date.getDate()}, ${date.getFullYear()}`;
 }
+
 export function sleep(ms: number = 3000): Promise<void> {
 	return new Promise((resolve) => setTimeout(resolve, ms));
 }

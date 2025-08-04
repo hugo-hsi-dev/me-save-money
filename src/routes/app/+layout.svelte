@@ -9,7 +9,7 @@
 	let { children }: LayoutProps = $props();
 </script>
 
-<svelte:boundary>
+<svelte:boundary onerror={(e) => console.error(e)}>
 	<div class="relative z-10 flex min-h-svh flex-col bg-background" data-vaul-drawer-wrapper>
 		<AppHeader />
 		<main class="flex flex-1 flex-col px-6">
