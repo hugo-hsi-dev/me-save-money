@@ -10,14 +10,18 @@ export class DBService {
 		this.db = dbClient;
 	}
 
+	async deletePreset(id: string) {
+		return await this.db.delete(table.preset).where(eq(table.preset.id, id)).returning();
+	}
 	async deleteSession(id: string) {
 		return await this.db.delete(table.session).where(eq(table.session.id, id)).returning();
 	}
-
+	async getPresets() {
+		return await this.db.select().from(table.preset);
+	}
 	async insertSession(data: { expiresAt: Date; id: string; user: User }) {
 		return await this.db.insert(table.session).values(data).returning();
 	}
-
 	async selectOneSession(id: string) {
 		const result = await this.db
 			.select({ expiresAt: table.session.expiresAt, user: table.session.user })
@@ -31,7 +35,13 @@ export class DBService {
 
 		return result[0];
 	}
-
+	async updatePreset({ amount, id, name }: { amount?: string; id: string; name?: string }) {
+		return this.db
+			.update(table.preset)
+			.set({ amount, name })
+			.where(eq(table.session.id, id))
+			.returning();
+	}
 	async updateSessionById({ expiresAt, id, user }: { expiresAt?: Date; id: string; user?: User }) {
 		return this.db
 			.update(table.session)
