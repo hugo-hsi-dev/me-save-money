@@ -5,5 +5,5 @@
 
 <div class="flex flex-col gap-3">
 	<Label>Name</Label>
-	<Input />
+	<Input name="name" />
 </div>

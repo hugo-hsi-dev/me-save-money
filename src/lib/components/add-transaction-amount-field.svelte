@@ -6,9 +6,10 @@
 </script>
 
 <div class="flex items-center justify-center pt-12 pb-4">
+	<input type="hidden" value={formattedValue} name="amount" />
 	<label for="amount-field-{componentId}">
 		<span class={['text-7xl font-bold', { 'text-primary': isFocused }]}>${formattedValue}</span>
-		<!-- svelte-ignore a11y_autofocus -->
+
 		<input
 			type="text"
 			bind:value
@@ -16,7 +17,6 @@
 			onblur={() => (isFocused = false)}
 			id="amount-field-{componentId}"
 			inputmode="numeric"
-			autofocus
 			class="size-0 opacity-0"
 		/>
 	</label>

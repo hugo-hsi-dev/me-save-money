@@ -1,52 +1,37 @@
 <script lang="ts">
-	import type { CalendarDate } from '@internationalized/date';
-
-	import { getLocalTimeZone } from '@internationalized/date';
-	import ChevronDownIcon from '@lucide/svelte/icons/chevron-down';
-	import { Button } from '$lib/components/ui/button/index.js';
-	import Calendar from '$lib/components/ui/calendar/calendar.svelte';
+	import {
+		fromDate,
+		getLocalTimeZone,
+		now,
+		parseAbsolute,
+		parseAbsoluteToLocal,
+		toZoned
+	} from '@internationalized/date';
 	import { Input } from '$lib/components/ui/input/index.js';
 	import { Label } from '$lib/components/ui/label/index.js';
-	import * as Popover from '$lib/components/ui/popover/index.js';
 
 	const id = $props.id();
 
-	let open = $state(false);
-	let value = $state<CalendarDate | undefined>();
+	let value = $state(now(getLocalTimeZone()));
+
+	let nativeDateValue = $derived(value.toDate());
 </script>
 
 <div class="flex gap-4">
 	<div class="flex flex-col gap-3">
+		<input type="hidden" value={nativeDateValue} name="paidAt" />
 		<Label for="{id}-date" class="px-1">Date</Label>
-		<Popover.Root bind:open>
-			<Popover.Trigger id="{id}-date">
-				{#snippet child({ props })}
-					<Button {...props} variant="outline" class="w-32 justify-between font-normal">
-						{value ? value.toDate(getLocalTimeZone()).toLocaleDateString() : 'Select date'}
-						<ChevronDownIcon />
-					</Button>
-				{/snippet}
-			</Popover.Trigger>
-			<Popover.Content class="w-auto overflow-hidden p-0" align="start">
-				<Calendar
-					type="single"
-					bind:value
-					onValueChange={() => {
-						open = false;
-					}}
-					captionLayout="dropdown"
-				/>
-			</Popover.Content>
-		</Popover.Root>
-	</div>
-	<div class="flex flex-col gap-3">
-		<Label for="{id}-time" class="px-1">Time</Label>
 		<Input
-			type="time"
-			id="{id}-time"
-			step="1"
-			value="10:30:00"
-			class="appearance-none bg-background [&::-webkit-calendar-picker-indicator]:hidden [&::-webkit-calendar-picker-indicator]:appearance-none"
+			type="datetime-local"
+			id="{id}-date"
+			bind:value={
+				() => {
+					return value.toString().slice(0, 16);
+				},
+				(newValue) => {
+					value = fromDate(new Date(newValue), getLocalTimeZone());
+				}
+			}
 		/>
 	</div>
 </div>
