@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { isHttpError } from '@sveltejs/kit';
-	import { resolve } from '$app/paths';
+	import { asset, resolve } from '$app/paths';
 	import AppHeader from '$lib/components/app-header.svelte';
 	import { Button } from '$lib/components/ui/button';
 
@@ -9,10 +9,14 @@
 	let { children }: LayoutProps = $props();
 </script>
 
-<svelte:boundary>
-	<div class="relative z-10 flex min-h-svh flex-col bg-background">
+<svelte:head>
+	<link rel="manifest" href={asset('/manifest-app.json')} />
+</svelte:head>
+
+<svelte:boundary onerror={(e) => console.error(e)}>
+	<div class="relative z-10 flex min-h-svh flex-col bg-background" data-vaul-drawer-wrapper>
 		<AppHeader />
-		<main class="flex flex-1 flex-col">
+		<main class="flex flex-1 flex-col px-6">
 			{@render children()}
 		</main>
 	</div>

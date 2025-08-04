@@ -3,7 +3,7 @@ import type { User } from '$lib/config';
 
 import { db, type DBClient } from '$lib/server/db';
 import * as table from '$lib/server/db/schema';
-import { eq } from 'drizzle-orm';
+import { eq, sql, sum } from 'drizzle-orm';
 
 export class DBService {
 	private db: DBClient;
@@ -48,6 +48,25 @@ export class DBService {
 	}) {
 		return this.db.insert(table.transaction).values(data).returning();
 	}
+
+	async selectAmountSpentPerWeek(timezone: string) {
+		const week = sql`${table.transaction.forWeek} AT TIME ZONE '${sql.raw(timezone)}'`.mapWith(
+			table.transaction.forWeek
+		);
+
+		const result = await db
+			.select({
+				amount: sum(table.transaction.amount),
+				week
+			})
+			.from(table.transaction)
+			.groupBy(week);
+
+		console.log(result);
+
+		return result;
+	}
+
 	async selectOneSession(id: string) {
 		const result = await this.db
 			.select({ expiresAt: table.session.expiresAt, user: table.session.user })
@@ -61,6 +80,20 @@ export class DBService {
 
 		return result[0];
 	}
+
+	async selectTransactionsByForWeek(week: Date) {
+		return await this.db
+			.select({
+				amount: table.transaction.amount,
+				id: table.transaction.id,
+				name: table.transaction.name,
+				paidAt: table.transaction.paidAt,
+				user: table.transaction.user
+			})
+			.from(table.transaction)
+			.where(eq(table.transaction.forWeek, week));
+	}
+
 	async updatePreset({ id, ...data }: { amount?: string; id: string; name?: string }) {
 		return this.db
 			.update(table.preset)
