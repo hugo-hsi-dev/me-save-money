@@ -1,4 +1,3 @@
-import { getPreviousMonday } from '$lib';
 import type { User } from '$lib/config';
 
 import { db, type DBClient } from '$lib/server/db';
@@ -11,34 +10,42 @@ export class DBService {
 		this.db = dbClient;
 	}
 
+	async deleteBudget(id: string) {
+		return await this.db.delete(table.budget).where(eq(table.budget.id, id)).returning();
+	}
+
 	async deletePreset(id: string) {
 		return await this.db.delete(table.preset).where(eq(table.preset.id, id)).returning();
 	}
+
 	async deleteSession(id: string) {
 		return await this.db.delete(table.session).where(eq(table.session.id, id)).returning();
 	}
-	async deleteBudget(id: number) {
-		return await this.db.delete(table.budget).where(eq(table.budget.id, id)).returning();
+
+	async getBudgetByAppliesTo(appliesTo: Date) {
+		return await this.db
+			.select({ appliesTo: table.budget.appliesTo })
+			.from(table.budget)
+			.where(eq(table.budget.appliesTo, appliesTo))
+			.limit(1);
 	}
+
 	async getPresets() {
 		return await this.db.select().from(table.preset);
 	}
-	async getBudgets() {
-		return await this.db.select().from(table.budget);
+
+	async insertBudget(data: { amount: string; appliesTo: Date }) {
+		return await this.db.insert(table.budget).values(data).returning();
 	}
-	async getBudgetByDate(date: Date) {
-		return await this.db.select({appliesTo: table.budget.appliesTo}).from(table.budget)
-			.where(eq(table.budget.appliesTo, getPreviousMonday(date))).limit(1);
+
+	async insertPreset(data: { amount: string; name: string }) {
+		return await this.db.insert(table.preset).values(data).returning();
 	}
+
 	async insertSession(data: { expiresAt: Date; id: string; user: User }) {
 		return await this.db.insert(table.session).values(data).returning();
 	}
-	async insertBudget(data: {amount: string, appliesTo: Date}) {
-		return await this.db.insert(table.budget).values(data).returning();
-	}
-	async insertPreset(data: {amount: string, name: string}) {
-		return await this.db.insert(table.preset).values(data).returning();
-	}
+
 	async insertTransaction(data: {
 		amount: string;
 		id: string;
@@ -94,25 +101,15 @@ export class DBService {
 			.where(eq(table.transaction.forWeek, week));
 	}
 
+	async updateBudget({ id, ...data }: { amount?: string; id: string }) {
+		return this.db.update(table.budget).set(data).where(eq(table.budget.id, id)).returning();
+	}
+
 	async updatePreset({ id, ...data }: { amount?: string; id: string; name?: string }) {
-		return this.db
-			.update(table.preset)
-			.set(data)
-			.where(eq(table.session.id, id))
-			.returning();
+		return this.db.update(table.preset).set(data).where(eq(table.session.id, id)).returning();
 	}
+
 	async updateSessionById({ id, ...data }: { expiresAt?: Date; id: string; user?: User }) {
-		return this.db
-			.update(table.session)
-			.set(data)
-			.where(eq(table.session.id, id))
-			.returning();
-	}
-	async updateBudget({  id, ...data }: { amount?: string; id: number }) {
-		return this.db
-			.update(table.budget)
-			.set(data)
-			.where(eq(table.budget.id, id))
-			.returning();
+		return this.db.update(table.session).set(data).where(eq(table.session.id, id)).returning();
 	}
 }

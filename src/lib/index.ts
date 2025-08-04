@@ -37,23 +37,3 @@ export function formatRelativeDate(timestamp: string): string {
 export function sleep(ms: number = 3000): Promise<void> {
 	return new Promise((resolve) => setTimeout(resolve, ms));
 }
-export function getPreviousMonday(date: Date): Date {
-  const result = new Date(date)
-  const dayOfWeek = result.getDay() // 0 = Sunday, 1 = Monday, ..., 6 = Saturday
-
-  let daysToSubtract: number
-
-  if (dayOfWeek === 1) {
-    // If it's Monday and we want to include the same day, return the same Monday
-    daysToSubtract = 0
-  } else if (dayOfWeek === 0) {
-    // If it's Sunday, go back 6 days to get Monday
-    daysToSubtract = 6
-  } else {
-    // For Tuesday through Saturday, go back (dayOfWeek - 1) days
-    daysToSubtract = dayOfWeek - 1
-  }
-
-  result.setDate(result.getDate() - daysToSubtract)
-  return result
-}
