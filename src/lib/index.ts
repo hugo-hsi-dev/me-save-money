@@ -5,7 +5,7 @@ export function formatRelativeDate(timestamp: string): string {
 	const date = new Date(timestamp);
 	const diff = Math.floor((now - date.getTime()) / 1000);
 
-	if (diff < 60) return diff <= 1 ? '1 second ago' : `${diff} seconds ago`;
+	if (diff < 60) return diff <= 10 ? 'few moments ago' : `${diff} seconds ago`;
 
 	const minutes = Math.floor(diff / 60);
 	if (minutes < 60) return minutes === 1 ? '1 minute ago' : `${minutes} minutes ago`;
@@ -35,4 +35,27 @@ export function formatRelativeDate(timestamp: string): string {
 }
 export function sleep(ms: number = 3000): Promise<void> {
 	return new Promise((resolve) => setTimeout(resolve, ms));
+}
+export function getPreviousMonday(date: Date, includeSameDay = true): Date {
+  const result = new Date(date)
+  const dayOfWeek = result.getDay() // 0 = Sunday, 1 = Monday, ..., 6 = Saturday
+
+  let daysToSubtract: number
+
+  if (dayOfWeek === 1 && includeSameDay) {
+    // If it's Monday and we want to include the same day, return the same Monday
+    daysToSubtract = 0
+  } else if (dayOfWeek === 1 && !includeSameDay) {
+    // If it's Monday and we want the previous Monday, go back 7 days
+    daysToSubtract = 7
+  } else if (dayOfWeek === 0) {
+    // If it's Sunday, go back 6 days to get Monday
+    daysToSubtract = 6
+  } else {
+    // For Tuesday through Saturday, go back (dayOfWeek - 1) days
+    daysToSubtract = dayOfWeek - 1
+  }
+
+  result.setDate(result.getDate() - daysToSubtract)
+  return result
 }
