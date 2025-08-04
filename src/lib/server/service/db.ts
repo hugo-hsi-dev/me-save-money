@@ -46,6 +46,8 @@ export class DBService {
 			.from(table.transaction)
 			.groupBy(week);
 
+		console.log(result);
+
 		return result;
 	}
 

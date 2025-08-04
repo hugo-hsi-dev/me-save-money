@@ -1,8 +1,10 @@
 <script lang="ts">
 	import type { HTMLAnchorAttributes } from 'svelte/elements';
 
+	import { CalendarDate, endOfWeek, getLocalTimeZone, startOfWeek } from '@internationalized/date';
 	import { Button, type ButtonProps } from '$lib/components/ui/button';
 	import * as Popover from '$lib/components/ui/popover';
+	import { getAmountSpentPerWeek } from '$lib/remote/transaction.remote';
 	import { cn } from '$lib/utils.js';
 
 	type MobileLinkProps = {
@@ -61,19 +63,6 @@
 	];
 </script>
 
-{#snippet MobileLink({ class: className, content, href, ...props }: MobileLinkProps)}
-	<a
-		{href}
-		onclick={() => {
-			open = false;
-		}}
-		class={cn('text-2xl font-medium', className)}
-		{...props}
-	>
-		{content}
-	</a>
-{/snippet}
-
 <Popover.Root bind:open>
 	<Popover.Trigger>
 		{#snippet child({ props })}
@@ -117,18 +106,48 @@
 	>
 		<div class="flex flex-col gap-12 overflow-auto px-6 py-6">
 			<div class="flex flex-col gap-8">
-				{#each seed as years (years.year)}
-					<div class="flex flex-col gap-4">
-						<div class="text-sm font-medium text-muted-foreground">
-							{years.year}
+				<svelte:boundary>
+					{#each await getAmountSpentPerWeek(getLocalTimeZone()) as years (years.year)}
+						<div class="flex flex-col gap-4">
+							<div class="text-sm font-medium text-muted-foreground">
+								{years.year}
+							</div>
+							<div class="flex flex-col gap-3">
+								{#each years.weeks as week, i (i)}
+									{@const calendarDate = new CalendarDate(
+										week.week.getUTCFullYear(),
+										week.week.getUTCMonth() + 1,
+										week.week.getUTCDate()
+									)}
+									{@const middleOfWeek = calendarDate.add({ days: 4 })}
+									<a
+										href="/"
+										onclick={() => {
+											open = false;
+										}}
+										class={cn('flex items-center justify-between text-2xl font-medium', className)}
+									>
+										<span>
+											{startOfWeek(middleOfWeek, getLocalTimeZone(), 'mon')
+												.toDate(getLocalTimeZone())
+												.toLocaleDateString('en-US', { day: '2-digit', month: 'short' })}
+											-
+											{endOfWeek(middleOfWeek, getLocalTimeZone(), 'mon')
+												.toDate(getLocalTimeZone())
+												.toLocaleDateString('en-US', { day: '2-digit', month: 'short' })}
+										</span>
+										<span class="text-lg text-muted-foreground">
+											${week.amount}
+										</span>
+									</a>
+								{/each}
+							</div>
 						</div>
-						<div class="flex flex-col gap-3">
-							{#each years.weeks as week, i (i)}
-								{@render MobileLink({ content: week.startOfWeek, href: week.href })}
-							{/each}
-						</div>
-					</div>
-				{/each}
+					{/each}
+					{#snippet pending()}
+						loading...
+					{/snippet}
+				</svelte:boundary>
 			</div>
 		</div>
 	</Popover.Content>
