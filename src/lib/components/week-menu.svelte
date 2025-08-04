@@ -3,15 +3,20 @@
 		CalendarDate,
 		endOfWeek,
 		getLocalTimeZone,
+		parseDate,
 		startOfWeek,
 		today
 	} from '@internationalized/date';
+	import { page } from '$app/state';
 	import { Button } from '$lib/components/ui/button';
 	import * as Popover from '$lib/components/ui/popover';
 	import { getAmountSpentPerWeek } from '$lib/remote/transaction.remote';
 	import { cn } from '$lib/utils.js';
 
 	let open = $state(false);
+
+	let selectedFrom = $derived(page.url.searchParams.get('from'));
+	let selectedTo = $derived(page.url.searchParams.get('to'));
 </script>
 
 <Popover.Root bind:open>
@@ -78,7 +83,11 @@
 									>
 										<span
 											class={{
-												'text-primary': true
+												'text-primary':
+													selectedFrom &&
+													selectedTo &&
+													parseDate(selectedFrom).compare(from) === 0 &&
+													parseDate(selectedTo).compare(to) === 0
 											}}
 										>
 											{#if startOfWeek(today(getLocalTimeZone()), getLocalTimeZone(), 'mon').compare(from) === 0 && endOfWeek(today(getLocalTimeZone()), getLocalTimeZone(), 'mon').compare(to) === 0}
