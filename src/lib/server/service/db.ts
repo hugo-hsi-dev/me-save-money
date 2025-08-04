@@ -2,7 +2,7 @@ import type { User } from '$lib/config';
 
 import { db, type DBClient } from '$lib/server/db';
 import * as table from '$lib/server/db/schema';
-import { eq } from 'drizzle-orm';
+import { eq, sql, sum } from 'drizzle-orm';
 
 export class DBService {
 	private db: DBClient;
@@ -32,6 +32,23 @@ export class DBService {
 	}) {
 		return this.db.insert(table.transaction).values(data).returning();
 	}
+
+	async selectAmountSpentPerWeek(timezone: string) {
+		const week = sql`${table.transaction.forWeek} AT TIME ZONE '${sql.raw(timezone)}'`.mapWith(
+			table.transaction.forWeek
+		);
+
+		const result = await db
+			.select({
+				amount: sum(table.transaction.amount),
+				week
+			})
+			.from(table.transaction)
+			.groupBy(week);
+
+		return result;
+	}
+
 	async selectOneSession(id: string) {
 		const result = await this.db
 			.select({ expiresAt: table.session.expiresAt, user: table.session.user })
