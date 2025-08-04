@@ -18,12 +18,12 @@ export const changeBudget = command(
 		const dbService = new DBService();
 		const budget = await dbService.updateBudget({ amount, id });
 		await getBudgets().refresh();
-		await getBudgetByDate(budget[0].appliesTo);
+		await getBudgetByDate(budget[0].appliesTo).refresh();
 	}
 );
 
 export const deleteBudget = command(z.object({ id: z.string() }), async ({ id }) => {
 	const dbService = new DBService();
-	await dbService.deletePreset(id);
+	await dbService.deleteBudget(id);
 	await getBudgets().refresh();
 });

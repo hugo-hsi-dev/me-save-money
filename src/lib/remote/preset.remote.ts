@@ -7,6 +7,16 @@ export const getPresets = query(async () => {
 	return dbService.getPresets();
 });
 
+export const createPreset = command(
+	z.object({ amount: z.string(), name: z.string() }),
+	async ({ amount, name }) => {
+		const dbService = new DBService();
+		const newPreset = await dbService.insertPreset({ amount, name });
+		await getPresets().refresh();
+		return newPreset;
+	}
+);
+
 export const changePreset = command(
 	z.object({ amount: z.string(), id: z.string(), name: z.string() }),
 	async ({ amount, id, name }) => {

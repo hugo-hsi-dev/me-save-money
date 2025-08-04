@@ -17,6 +17,9 @@ export class DBService {
 	async deleteSession(id: string) {
 		return await this.db.delete(table.session).where(eq(table.session.id, id)).returning();
 	}
+	async deleteBudget(id: number) {
+		return await this.db.delete(table.budget).where(eq(table.budget.id, id)).returning();
+	}
 	async getPresets() {
 		return await this.db.select().from(table.preset);
 	}
@@ -32,6 +35,9 @@ export class DBService {
 	}
 	async insertBudget(data: {amount: string, appliesTo: Date}) {
 		return await this.db.insert(table.budget).values(data).returning();
+	}
+	async insertPreset(data: {amount: string, name: string}) {
+		return await this.db.insert(table.preset).values(data).returning();
 	}
 	async insertTransaction(data: {
 		amount: string;
