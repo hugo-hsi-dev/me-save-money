@@ -16,7 +16,7 @@
 	<Portal>
 		<Drawer.Trigger>
 			{#snippet child({ props })}
-				<Button {...props} class="fixed right-12 bottom-12 z-50 h-16 w-16 rounded-full"
+				<Button {...props} class="fixed right-12 bottom-12 z-10 h-16 w-16 rounded-full"
 					><PlusIcon /></Button
 				>
 			{/snippet}
