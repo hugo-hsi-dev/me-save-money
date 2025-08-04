@@ -22,6 +22,16 @@ export class DBService {
 	async insertSession(data: { expiresAt: Date; id: string; user: User }) {
 		return await this.db.insert(table.session).values(data).returning();
 	}
+
+	async insertTransaction(data: {
+		amount: string;
+		id: string;
+		name: string;
+		paidAt: Date;
+		user: User;
+	}) {
+		return this.db.insert(table.transaction).values(data).returning();
+	}
 	async selectOneSession(id: string) {
 		const result = await this.db
 			.select({ expiresAt: table.session.expiresAt, user: table.session.user })
