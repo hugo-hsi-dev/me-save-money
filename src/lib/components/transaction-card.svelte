@@ -7,27 +7,26 @@
 	import Trash2 from '@lucide/svelte/icons/trash-2';
 
 	interface Props {
-		title: string;
-		price: number;
 		date: string;
-		user: string;
-		status?: 'ongoing' | 'completed' | 'pending';
-		onEdit?: () => void;
 		onDelete?: () => void;
+		onEdit?: () => void;
+		price: number;
+		status?: 'completed' | 'ongoing' | 'pending';
+		title: string;
+		user: string;
 	}
 
-	let { title, price, date, user, status = 'ongoing', onEdit, onDelete }: Props = $props();
+	let { date, onDelete, onEdit, price, status = 'ongoing', title, user }: Props = $props();
 
 	const formatPrice = (amount: number) => {
 		return new Intl.NumberFormat('en-US', {
-			style: 'currency',
-			currency: 'USD'
+			currency: 'USD',
+			style: 'currency'
 		}).format(amount);
 	};
 
 	const formattedPrice = $derived(formatPrice(price));
 	const formattedDate = $derived(formatRelativeDate(date));
-	const capitalizedStatus = $derived(status.charAt(0).toUpperCase() + status.slice(1));
 </script>
 
 <Card class="w-full max-w-sm p-4">

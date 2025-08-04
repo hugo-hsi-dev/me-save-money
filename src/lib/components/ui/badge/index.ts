@@ -1,2 +1,2 @@
-export { default as Badge } from "./badge.svelte";
-export { badgeVariants, type BadgeVariant } from "./badge.svelte";
+// eslint-disable-next-line perfectionist/sort-named-exports
+export { default as Badge, badgeVariants, type BadgeVariant } from './badge.svelte';

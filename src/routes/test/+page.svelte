@@ -11,32 +11,36 @@
 
 	const budgetItems = [
 		{
-			title: 'Grocery Shopping',
-			price: 12.31,
+			id: 0,
 			date: '2025-03-08',
-			user: 'John Doe',
-			status: 'ongoing' as const
+			price: 12.31,
+			status: 'ongoing' as const,
+			title: 'Grocery Shopping',
+			user: 'John Doe'
 		},
 		{
-			title: 'Monthly Rent Payment',
-			price: 1250.0,
+			id: 1,
 			date: '2025-03-01',
-			user: 'Jane Smith',
-			status: 'completed' as const
+			price: 1250.0,
+			status: 'completed' as const,
+			title: 'Monthly Rent Payment',
+			user: 'Jane Smith'
 		},
 		{
-			title: 'Utility Bills',
-			price: 89.45,
+			id: 2,
 			date: '2025-03-15',
-			user: 'Mike Johnson',
-			status: 'pending' as const
+			price: 89.45,
+			status: 'pending' as const,
+			title: 'Utility Bills',
+			user: 'Mike Johnson'
 		},
 		{
-			title: 'Coffee & Snacks',
-			price: 24.67,
+			id: 3,
 			date: '2025-03-07',
-			user: 'Sarah Wilson',
-			status: 'ongoing' as const
+			price: 24.67,
+			status: 'ongoing' as const,
+			title: 'Coffee & Snacks',
+			user: 'Sarah Wilson'
 		}
 	];
 </script>
@@ -45,7 +49,7 @@
 	<h1 class="mb-6 text-2xl font-bold">Budget Cards Demo</h1>
 
 	<div class="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
-		{#each budgetItems as item}
+		{#each budgetItems as item (item.id)}
 			<TransactionCard
 				title={item.title}
 				price={item.price}
