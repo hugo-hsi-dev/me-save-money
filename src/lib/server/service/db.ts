@@ -1,3 +1,4 @@
+import { getPreviousMonday } from '$lib';
 import type { User } from '$lib/config';
 
 import { db, type DBClient } from '$lib/server/db';
@@ -19,10 +20,19 @@ export class DBService {
 	async getPresets() {
 		return await this.db.select().from(table.preset);
 	}
+	async getBudgets() {
+		return await this.db.select().from(table.budget);
+	}
+	async getBudgetByDate(date: Date) {
+		return await this.db.select({appliesTo: table.budget.appliesTo}).from(table.budget)
+			.where(eq(table.budget.appliesTo, getPreviousMonday(date))).limit(1);
+	}
 	async insertSession(data: { expiresAt: Date; id: string; user: User }) {
 		return await this.db.insert(table.session).values(data).returning();
 	}
-
+	async insertBudget(data: {amount: string, appliesTo: Date}) {
+		return await this.db.insert(table.budget).values(data).returning();
+	}
 	async insertTransaction(data: {
 		amount: string;
 		id: string;
@@ -45,18 +55,25 @@ export class DBService {
 
 		return result[0];
 	}
-	async updatePreset({ amount, id, name }: { amount?: string; id: string; name?: string }) {
+	async updatePreset({ id, ...data }: { amount?: string; id: string; name?: string }) {
 		return this.db
 			.update(table.preset)
-			.set({ amount, name })
+			.set(data)
 			.where(eq(table.session.id, id))
 			.returning();
 	}
-	async updateSessionById({ expiresAt, id, user }: { expiresAt?: Date; id: string; user?: User }) {
+	async updateSessionById({ id, ...data }: { expiresAt?: Date; id: string; user?: User }) {
 		return this.db
 			.update(table.session)
-			.set({ expiresAt, user })
+			.set(data)
 			.where(eq(table.session.id, id))
+			.returning();
+	}
+	async updateBudget({  id, ...data }: { amount?: string; id: number }) {
+		return this.db
+			.update(table.budget)
+			.set(data)
+			.where(eq(table.budget.id, id))
 			.returning();
 	}
 }

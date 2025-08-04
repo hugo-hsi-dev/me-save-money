@@ -1,5 +1,5 @@
 import { type SQL, sql } from 'drizzle-orm';
-import { date, index, numeric, pgEnum, pgTable, text, timestamp } from 'drizzle-orm/pg-core';
+import { date, index, numeric, pgEnum, pgTable, text, timestamp, serial } from 'drizzle-orm/pg-core';
 
 import { USER_CONFIG } from '../../config';
 
@@ -38,8 +38,8 @@ export const preset = pgTable('presets', {
 
 export const budget = pgTable('budget', {
 	amount: numeric({ precision: 12, scale: 2 }).notNull(),
-	appliesTo: date({ mode: 'date' }).notNull(),
+	appliesTo: date({ mode: 'date' }).notNull().unique(),
 	createdAt: timestamp().defaultNow().notNull(),
-	id: text().primaryKey(),
+	id: serial().primaryKey(),
 	updatedAt: timestamp()
 });
