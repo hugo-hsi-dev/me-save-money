@@ -2,28 +2,16 @@ import { command, query } from '$app/server';
 import { DBService } from '$lib/server/service/db';
 import z from 'zod';
 
-export const getBudgets = query(async () => {
+export const getBudgetByAppliesTo = query(z.date(), async (date) => {
 	const dbService = new DBService();
-	return dbService.getBudgets();
-});
-
-export const getBudgetByDate = query(z.date(), async (date) => {
-	const dbService = new DBService();
-	return dbService.getBudgetByDate(date);
+	return dbService.selectBudgetByAppliesTo(date);
 });
 
 export const changeBudget = command(
-	z.object({ amount: z.string(), id: z.number()}),
+	z.object({ amount: z.string(), id: z.string() }),
 	async ({ amount, id }) => {
 		const dbService = new DBService();
 		const budget = await dbService.updateBudget({ amount, id });
-		await getBudgets().refresh();
-		await getBudgetByDate(budget[0].appliesTo).refresh();
+		await getBudgetByAppliesTo(budget[0].appliesTo).refresh();
 	}
 );
-
-export const deleteBudget = command(z.object({ id: z.string() }), async ({ id }) => {
-	const dbService = new DBService();
-	await dbService.deleteBudget(id);
-	await getBudgets().refresh();
-});

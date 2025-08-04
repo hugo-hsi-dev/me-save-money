@@ -10,28 +10,12 @@ export class DBService {
 		this.db = dbClient;
 	}
 
-	async deleteBudget(id: string) {
-		return await this.db.delete(table.budget).where(eq(table.budget.id, id)).returning();
-	}
-
 	async deletePreset(id: string) {
 		return await this.db.delete(table.preset).where(eq(table.preset.id, id)).returning();
 	}
 
 	async deleteSession(id: string) {
 		return await this.db.delete(table.session).where(eq(table.session.id, id)).returning();
-	}
-
-	async getBudgetByAppliesTo(appliesTo: Date) {
-		return await this.db
-			.select({ appliesTo: table.budget.appliesTo })
-			.from(table.budget)
-			.where(eq(table.budget.appliesTo, appliesTo))
-			.limit(1);
-	}
-
-	async getPresets() {
-		return await this.db.select().from(table.preset);
 	}
 
 	async insertBudget(data: { amount: string; appliesTo: Date }) {
@@ -69,9 +53,20 @@ export class DBService {
 			.from(table.transaction)
 			.groupBy(week);
 
-		console.log(result);
-
 		return result;
+	}
+
+	async selectBudgetByAppliesTo(appliesTo: Date) {
+		const result = await this.db
+			.select({ appliesTo: table.budget.appliesTo })
+			.from(table.budget)
+			.where(eq(table.budget.appliesTo, appliesTo))
+			.limit(1);
+
+		if (result.length === 0) {
+			return undefined;
+		}
+		return result[0];
 	}
 
 	async selectOneSession(id: string) {
@@ -86,6 +81,10 @@ export class DBService {
 		}
 
 		return result[0];
+	}
+
+	async selectPresets() {
+		return await this.db.select().from(table.preset);
 	}
 
 	async selectTransactionsByForWeek(week: Date) {

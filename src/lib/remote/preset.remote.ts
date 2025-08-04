@@ -4,7 +4,7 @@ import z from 'zod';
 
 export const getPresets = query(async () => {
 	const dbService = new DBService();
-	return dbService.getPresets();
+	return dbService.selectPresets();
 });
 
 export const createPreset = command(
