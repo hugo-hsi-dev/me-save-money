@@ -11,34 +11,30 @@
 
 	const budgetItems = [
 		{
-			id: 0,
 			date: '2025-03-08',
+			id: 0,
 			price: 12.31,
-			status: 'ongoing' as const,
 			title: 'Grocery Shopping',
 			user: 'John Doe'
 		},
 		{
-			id: 1,
 			date: '2025-03-01',
+			id: 1,
 			price: 1250.0,
-			status: 'completed' as const,
 			title: 'Monthly Rent Payment',
 			user: 'Jane Smith'
 		},
 		{
-			id: 2,
 			date: '2025-03-15',
+			id: 2,
 			price: 89.45,
-			status: 'pending' as const,
 			title: 'Utility Bills',
 			user: 'Mike Johnson'
 		},
 		{
-			id: 3,
 			date: '2025-03-07',
+			id: 3,
 			price: 24.67,
-			status: 'ongoing' as const,
 			title: 'Coffee & Snacks',
 			user: 'Sarah Wilson'
 		}
@@ -55,7 +51,6 @@
 				price={item.price}
 				date={item.date}
 				user={item.user}
-				status={item.status}
 				onEdit={() => handleEdit(item.title)}
 				onDelete={() => handleDelete(item.title)}
 			/>

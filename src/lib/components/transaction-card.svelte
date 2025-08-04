@@ -1,10 +1,10 @@
 <script lang="ts">
+	import Edit from '@lucide/svelte/icons/edit';
+	import Trash2 from '@lucide/svelte/icons/trash-2';
 	import { formatRelativeDate } from '$lib';
 	import { Badge } from '$lib/components/ui/badge';
 	import { Button } from '$lib/components/ui/button';
 	import { Card, CardContent } from '$lib/components/ui/card';
-	import Edit from '@lucide/svelte/icons/edit';
-	import Trash2 from '@lucide/svelte/icons/trash-2';
 
 	interface Props {
 		date: string;
@@ -16,7 +16,7 @@
 		user: string;
 	}
 
-	let { date, onDelete, onEdit, price, status = 'ongoing', title, user }: Props = $props();
+	let { date, onDelete, onEdit, price, title, user }: Props = $props();
 
 	const formatPrice = (amount: number) => {
 		return new Intl.NumberFormat('en-US', {
