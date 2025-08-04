@@ -45,6 +45,20 @@ export class DBService {
 
 		return result[0];
 	}
+
+	async selectTransactionsByForWeek(week: Date) {
+		return await this.db
+			.select({
+				amount: table.transaction.amount,
+				id: table.transaction.id,
+				name: table.transaction.name,
+				paidAt: table.transaction.paidAt,
+				user: table.transaction.user
+			})
+			.from(table.transaction)
+			.where(eq(table.transaction.forWeek, week));
+	}
+
 	async updatePreset({ amount, id, name }: { amount?: string; id: string; name?: string }) {
 		return this.db
 			.update(table.preset)

@@ -3,10 +3,16 @@
 	import * as Drawer from '$lib/components/ui/drawer/index.js';
 	import { Portal } from 'bits-ui';
 
+	import AddTransactionAmountField from './add-transaction-amount-field.svelte';
+	import AddTransactionForm from './add-transaction-form.svelte';
+	import AddTransactionNameField from './add-transaction-name-field.svelte';
+	import AddTransactionPaidAtField from './add-transaction-paid-at-field.svelte';
 	import { Button } from './ui/button';
+
+	let open = $state(false);
 </script>
 
-<Drawer.Root>
+<Drawer.Root bind:open>
 	<Portal>
 		<Drawer.Trigger>
 			{#snippet child({ props })}
@@ -16,14 +22,29 @@
 			{/snippet}
 		</Drawer.Trigger>
 	</Portal>
-	<Drawer.Content>
-		<Drawer.Header>
-			<Drawer.Title>Are you sure absolutely sure?</Drawer.Title>
-			<Drawer.Description>This action cannot be undone.</Drawer.Description>
-		</Drawer.Header>
-		<Drawer.Footer>
-			<Button>Submit</Button>
-			<Drawer.Close>Cancel</Drawer.Close>
-		</Drawer.Footer>
+	<Drawer.Content class="border-none bg-transparent">
+		<!-- BG Override -->
+		<div class="mt-2 rounded-t-3xl border-t bg-background">
+			<AddTransactionForm bind:drawerOpen={open}>
+				<!-- New Header Container -->
+				<div class="flex items-center justify-between p-2 pt-3">
+					<Drawer.Close>
+						{#snippet child({ props })}
+							<Button variant="link" type="button" class="text-lg" {...props}>Cancel</Button>
+						{/snippet}
+					</Drawer.Close>
+					<span class="absolute left-1/2 -translate-x-1/2 transform text-lg font-bold"
+						>New Transaction</span
+					>
+					<Button variant="link" class="text-lg font-bold" type="submit">Done</Button>
+				</div>
+				<div class="mb-6 flex flex-col gap-6 px-6">
+					<AddTransactionAmountField />
+					<AddTransactionNameField />
+					<AddTransactionPaidAtField />
+					<div class="mb-[800px]"></div>
+				</div>
+			</AddTransactionForm>
+		</div>
 	</Drawer.Content>
 </Drawer.Root>
