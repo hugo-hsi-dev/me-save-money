@@ -10,7 +10,7 @@ export const getPresets = query(async () => {
 	return dbService.selectPresets();
 });
 
-export const createPreset =  form(async (formData) => {
+export const createPreset = form(async (formData) => {
 	const rawData = Object.fromEntries(formData.entries());
 	const result = addPresetSchema.safeParse(rawData);
 
@@ -33,10 +33,9 @@ export const changePreset = form(async (formData) => {
 	}
 
 	const dbService = new DBService();
-		await dbService.updatePreset({ ...result.data });
-		await getPresets().refresh();
-	
-);
+	await dbService.updatePreset({ ...result.data });
+	await getPresets().refresh();
+});
 
 export const deletePreset = command(z.object({ id: z.string() }), async ({ id }) => {
 	const dbService = new DBService();

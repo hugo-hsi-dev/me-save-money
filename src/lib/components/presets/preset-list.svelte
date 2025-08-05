@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { getPresets } from '$lib/remote/preset.remote';
+
 	import * as Card from '../ui/card';
 
 	type Preset = {
@@ -16,9 +17,7 @@
 		{/each}
 	</ul>
 	{#snippet pending()}
-		<ul class="flex flex-col gap-2">
-			Waiting...
-		</ul>
+		<ul class="flex flex-col gap-2">Waiting...</ul>
 	{/snippet}
 </svelte:boundary>
 

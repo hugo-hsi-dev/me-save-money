@@ -1,8 +1,8 @@
 <script lang="ts" module>
 	export const changePresetSchema = z.object({
 		amount: z.string().refine((amount) => !isNaN(Number(amount))),
-		name: z.string(),
 		id: z.string(),
+		name: z.string()
 	});
 </script>
 

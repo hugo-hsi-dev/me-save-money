@@ -5,7 +5,7 @@
 	import TransactionList from '$lib/components/transaction-list.svelte';
 </script>
 
-<div class="space-y-2 mb-10">
+<div class="mb-10 space-y-2">
 	<PresetAddDrawer />
 	<PresetList />
 	<TransactionList />

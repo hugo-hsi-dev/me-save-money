@@ -1,11 +1,10 @@
 <script lang="ts">
 	import PlusIcon from '@lucide/svelte/icons/plus';
 	import * as Drawer from '$lib/components/ui/drawer/index.js';
-	import { Portal } from 'bits-ui';
 
-	import { Button } from '../ui/button';
 	import AddTransactionAmountField from '../add-transaction-amount-field.svelte';
 	import AddTransactionNameField from '../add-transaction-name-field.svelte';
+	import { Button } from '../ui/button';
 	import PresetAddForm from './preset-add-form.svelte';
 
 	let open = $state(false);
@@ -14,9 +13,7 @@
 <Drawer.Root bind:open>
 	<Drawer.Trigger>
 		{#snippet child({ props })}
-			<Button {...props} class=""
-				><PlusIcon />Create Preset</Button
-			>
+			<Button {...props} class=""><PlusIcon />Create Preset</Button>
 		{/snippet}
 	</Drawer.Trigger>
 	<Drawer.Content class="border-none bg-transparent">

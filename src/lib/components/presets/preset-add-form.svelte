@@ -1,7 +1,7 @@
 <script lang="ts" module>
 	export const addPresetSchema = z.object({
 		amount: z.string().refine((amount) => !isNaN(Number(amount))),
-		name: z.string(),
+		name: z.string()
 	});
 </script>
 
@@ -9,7 +9,6 @@
 	import type { Snippet } from 'svelte';
 
 	import { createPreset } from '$lib/remote/preset.remote';
-	import { nanoid } from 'nanoid';
 	import z from 'zod';
 	let { children, drawerOpen = $bindable() }: { children: Snippet; drawerOpen: boolean } = $props();
 </script>
