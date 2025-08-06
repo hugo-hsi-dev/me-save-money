@@ -3,6 +3,7 @@
 	import PresetAddDrawer from '$lib/components/presets/preset-add-drawer.svelte';
 	import PresetSelect from '$lib/components/presets/preset-select.svelte';
 	import TransactionList from '$lib/components/transaction-list.svelte';
+
 	import type { PageProps } from './$types';
 
 	let { data }: PageProps = $props();
