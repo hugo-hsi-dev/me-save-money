@@ -15,7 +15,7 @@ export const createPreset = form(async (formData) => {
 	const result = addPresetSchema.safeParse(rawData);
 
 	if (!result.success) {
-		return ERRORS.INTERNAL_SERVER_ERROR;
+		return ERRORS.BAD_REQUEST;
 	}
 
 	const dbService = new DBService();

@@ -3,10 +3,10 @@
 	import * as Drawer from '$lib/components/ui/drawer/index.js';
 	import { Portal } from 'bits-ui';
 
-	import AddTransactionAmountField from './add-transaction-amount-field.svelte';
 	import AddTransactionForm from './add-transaction-form.svelte';
-	import AddTransactionNameField from './add-transaction-name-field.svelte';
 	import AddTransactionPaidAtField from './add-transaction-paid-at-field.svelte';
+	import FormAmountField from './form-fields/form-amount-field.svelte';
+	import FormNameField from './form-fields/form-name-field.svelte';
 	import { Button } from './ui/button';
 
 	let open = $state(false);
@@ -39,8 +39,8 @@
 					<Button variant="link" class="text-lg font-bold" type="submit">Done</Button>
 				</div>
 				<div class="mb-6 flex flex-col gap-6 px-6">
-					<AddTransactionAmountField />
-					<AddTransactionNameField />
+					<FormAmountField />
+					<FormNameField />
 					<AddTransactionPaidAtField />
 					<div class="mb-[800px]"></div>
 				</div>

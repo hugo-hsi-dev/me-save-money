@@ -16,8 +16,7 @@
 <form
 	{...createPreset.enhance(async ({ submit }) => {
 		try {
-			// const data = Object.fromEntries(formData.entries());
-			// const validatedData = addTransactionSchema.parse(data);
+			// Client side form validation...
 			await submit();
 			drawerOpen = false;
 		} catch {

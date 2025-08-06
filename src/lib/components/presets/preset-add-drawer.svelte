@@ -2,8 +2,8 @@
 	import PlusIcon from '@lucide/svelte/icons/plus';
 	import * as Drawer from '$lib/components/ui/drawer/index.js';
 
-	import AddTransactionAmountField from '../add-transaction-amount-field.svelte';
-	import AddTransactionNameField from '../add-transaction-name-field.svelte';
+	import FormAmountField from '../form-fields/form-amount-field.svelte';
+	import FormNameField from '../form-fields/form-name-field.svelte';
 	import { Button } from '../ui/button';
 	import PresetAddForm from './preset-add-form.svelte';
 
@@ -33,8 +33,8 @@
 					<Button variant="link" class="text-lg font-bold" type="submit">Done</Button>
 				</div>
 				<div class="mb-6 flex flex-col gap-6 px-6">
-					<AddTransactionAmountField />
-					<AddTransactionNameField />
+					<FormAmountField />
+					<FormNameField />
 					<div class="mb-[800px]"></div>
 				</div>
 			</PresetAddForm>
