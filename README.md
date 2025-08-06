@@ -25,6 +25,21 @@ npm run dev
 npm run dev -- --open
 ```
 
+## Linting
+
+Don't have a formatter built in? Using Codespaces for example?  
+
+```sh
+# Use this to check for import errors
+pnpm check
+# Use to find prettier formatting
+pnpm format
+# Fix found formatting error
+pnpm fix
+# And finally lint up all the things
+pnpm lint
+```
+
 ## Building
 
 To create a production version of your app:
