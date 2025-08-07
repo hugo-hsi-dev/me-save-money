@@ -3,8 +3,8 @@
 	import { getTransactionByWeek } from '$lib/remote/transaction.remote';
 	import { getSelectedWeekContext } from '$lib/state/selected-week.svelte';
 
-	import { Badge } from './ui/badge';
-	import { Skeleton } from './ui/skeleton';
+	import { Badge } from '../ui/badge';
+	import { Skeleton } from '../ui/skeleton';
 
 	type Transaction = {
 		amount: string;

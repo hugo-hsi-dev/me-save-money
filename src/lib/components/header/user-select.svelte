@@ -4,8 +4,8 @@
 	import { type User, USER_CONFIG } from '$lib/config';
 	import { changeUser, getUser } from '$lib/remote/user.remote';
 
-	import { Button } from './ui/button';
-	import { Skeleton } from './ui/skeleton';
+	import { Button } from '../ui/button';
+	import { Skeleton } from '../ui/skeleton';
 </script>
 
 <svelte:boundary

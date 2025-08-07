@@ -4,7 +4,7 @@
 	import { getAmountSpentByWeek } from '$lib/remote/transaction.remote';
 	import { getSelectedWeekContext } from '$lib/state/selected-week.svelte';
 
-	import { Skeleton } from './ui/skeleton';
+	import { Skeleton } from '../ui/skeleton';
 	const selectedWeek = getSelectedWeekContext();
 
 	// [TODO] Change this query to use svelte:boundary and await
@@ -24,7 +24,9 @@
 {#if !amountSpentQuery.current || !totalBudgetQuery.current}
 	<Skeleton class="h-[60px] rounded" />
 {:else}
-	<span class="text-6xl font-bold">
-		{Number(totalBudgetQuery.current.amount) - Number(amountSpentQuery.current.amount)}
+	{@const remainingBudget =
+		Number(totalBudgetQuery.current.amount) - Number(amountSpentQuery.current.amount)}
+	<span class={['text-6xl font-bold', { 'text-destructive': remainingBudget < 0 }]}>
+		${remainingBudget}
 	</span>
 {/if}

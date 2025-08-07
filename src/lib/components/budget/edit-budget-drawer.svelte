@@ -1,7 +1,7 @@
 <script lang="ts">
 	import * as Drawer from '$lib/components/ui/drawer';
 
-	import FormAmountField from '../form-fields/form-amount-field.svelte';
+	import FormAmountField from '../reusable-fields/form-amount-field.svelte';
 	import { Button } from '../ui/button';
 	import EditBudgetForm from './edit-budget-form.svelte';
 

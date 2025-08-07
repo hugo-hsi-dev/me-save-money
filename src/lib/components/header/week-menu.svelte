@@ -12,7 +12,7 @@
 	import { getSelectedWeekContext } from '$lib/state/selected-week.svelte';
 	import { cn } from '$lib/utils.js';
 
-	import { Skeleton } from './ui/skeleton';
+	import { Skeleton } from '../ui/skeleton';
 
 	let open = $state(false);
 
