@@ -1,12 +1,11 @@
 import { command, query } from '$app/server';
-import { sleep } from '$lib';
 import { USER_CONFIG } from '$lib/config';
 import { DBService } from '$lib/server/service/db';
 import { LocalsService } from '$lib/server/service/locals';
 import z from 'zod';
 
 export const getUser = query(async () => {
-	await sleep();
+	// await sleep();
 	const localsService = new LocalsService();
 	return localsService.validateSession().user;
 });

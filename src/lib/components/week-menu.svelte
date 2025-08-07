@@ -9,14 +9,14 @@
 	import { Button } from '$lib/components/ui/button';
 	import * as Popover from '$lib/components/ui/popover';
 	import { getAmountSpentPerWeek } from '$lib/remote/transaction.remote';
-	import { getSelectedWeek } from '$lib/state/selected-week.svelte';
+	import { getSelectedWeekContext } from '$lib/state/selected-week.svelte';
 	import { cn } from '$lib/utils.js';
 
 	import { Skeleton } from './ui/skeleton';
 
 	let open = $state(false);
 
-	const selectedWeek = getSelectedWeek();
+	const selectedWeek = getSelectedWeekContext();
 </script>
 
 <Popover.Root bind:open>
@@ -74,17 +74,16 @@
 									{@const middleOfWeek = calendarDate.add({ days: 4 })}
 									{@const from = startOfWeek(middleOfWeek, getLocalTimeZone(), 'mon')}
 									{@const to = endOfWeek(middleOfWeek, getLocalTimeZone(), 'mon')}
-									<a
-										href="?from={from.toString()}&to={to.toString()}"
+									<button
 										onclick={() => {
+											selectedWeek.calendarDate = from;
 											open = false;
 										}}
 										class="flex items-center justify-between text-2xl font-medium"
 									>
 										<span
 											class={{
-												'text-primary':
-													selectedWeek.from.compare(from) === 0 && selectedWeek.to.compare(to) === 0
+												'text-primary': selectedWeek.calendarDate.compare(from) === 0
 											}}
 										>
 											{#if startOfWeek(today(getLocalTimeZone()), getLocalTimeZone(), 'mon').compare(from) === 0 && endOfWeek(today(getLocalTimeZone()), getLocalTimeZone(), 'mon').compare(to) === 0}
@@ -102,7 +101,7 @@
 										<span class="text-lg text-muted-foreground">
 											${week.amount}
 										</span>
-									</a>
+									</button>
 								{/each}
 							</div>
 						</div>

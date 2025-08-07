@@ -18,8 +18,12 @@ export class DBService {
 		return await this.db.delete(table.session).where(eq(table.session.id, id)).returning();
 	}
 
-	async insertBudget(data: { amount: string; appliesTo: Date }) {
-		return await this.db.insert(table.budget).values(data).returning();
+	async insertOrUpdateBudget(data: { amount: string; appliesTo: Date }) {
+		return await this.db
+			.insert(table.budget)
+			.values(data)
+			.onConflictDoUpdate({ set: data, target: table.budget.appliesTo })
+			.returning();
 	}
 
 	async insertPreset(data: { amount: string; name: string }) {
@@ -40,6 +44,25 @@ export class DBService {
 		return this.db.insert(table.transaction).values(data).returning();
 	}
 
+	async selectAmountSpentByForWeek({ forWeek, timezone }: { forWeek: Date; timezone: string }) {
+		const week = sql`${table.transaction.forWeek} AT TIME ZONE '${sql.raw(timezone)}'`.mapWith(
+			table.transaction.forWeek
+		);
+
+		const result = await db
+			.select({
+				amount: sum(table.transaction.amount)
+			})
+			.from(table.transaction)
+			.groupBy(week)
+			.where(eq(table.transaction.forWeek, forWeek));
+
+		if (result.length === 0) {
+			return undefined;
+		}
+		return result[0];
+	}
+
 	async selectAmountSpentPerWeek(timezone: string) {
 		const week = sql`${table.transaction.forWeek} AT TIME ZONE '${sql.raw(timezone)}'`.mapWith(
 			table.transaction.forWeek
@@ -58,7 +81,10 @@ export class DBService {
 
 	async selectBudgetByAppliesTo(appliesTo: Date) {
 		const result = await this.db
-			.select({ appliesTo: table.budget.appliesTo })
+			.select({
+				amount: table.budget.amount,
+				id: table.budget.id
+			})
 			.from(table.budget)
 			.where(eq(table.budget.appliesTo, appliesTo))
 			.limit(1);
@@ -84,7 +110,9 @@ export class DBService {
 	}
 
 	async selectPresets() {
-		return await this.db.select().from(table.preset);
+		return await this.db
+			.select({ amount: table.preset.amount, id: table.preset.id, name: table.preset.name })
+			.from(table.preset);
 	}
 
 	async selectTransactionsByForWeek(week: Date) {
@@ -98,10 +126,6 @@ export class DBService {
 			})
 			.from(table.transaction)
 			.where(eq(table.transaction.forWeek, week));
-	}
-
-	async updateBudget({ id, ...data }: { amount?: string; id: string }) {
-		return this.db.update(table.budget).set(data).where(eq(table.budget.id, id)).returning();
 	}
 
 	async updatePreset({ id, ...data }: { amount?: string; id: string; name?: string }) {

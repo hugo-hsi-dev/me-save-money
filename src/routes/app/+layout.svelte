@@ -3,10 +3,13 @@
 	import { asset, resolve } from '$app/paths';
 	import AppHeader from '$lib/components/app-header.svelte';
 	import { Button } from '$lib/components/ui/button';
+	import { setSelectedWeekContext } from '$lib/state/selected-week.svelte';
 
 	import type { LayoutProps } from '../$types';
 
 	let { children }: LayoutProps = $props();
+
+	setSelectedWeekContext();
 </script>
 
 <svelte:head>
