@@ -1,4 +1,4 @@
-import { command, form, query } from '$app/server';
+import { form, query } from '$app/server';
 import { changeBudgetSchema } from '$lib/components/budget/edit-budget-form.svelte';
 import { ERRORS } from '$lib/server/errors';
 import { DBService } from '$lib/server/service/db';

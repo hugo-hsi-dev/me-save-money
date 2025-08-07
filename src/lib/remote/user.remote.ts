@@ -1,5 +1,4 @@
 import { command, query } from '$app/server';
-import { sleep } from '$lib';
 import { USER_CONFIG } from '$lib/config';
 import { DBService } from '$lib/server/service/db';
 import { LocalsService } from '$lib/server/service/locals';
