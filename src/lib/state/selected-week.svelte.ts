@@ -5,11 +5,10 @@ import {
 	startOfWeek,
 	today
 } from '@internationalized/date';
-import { page } from '$app/state';
 
-export function getSelectedWeek() {
-	const isoFrom = $derived(page.url.searchParams.get('from'));
-	const isoTo = $derived(page.url.searchParams.get('to'));
+export function getSelectedWeek(searchParams: URLSearchParams) {
+	const isoFrom = searchParams.get('from');
+	const isoTo = searchParams.get('to');
 
 	return {
 		get from() {

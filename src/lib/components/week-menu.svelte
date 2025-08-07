@@ -6,6 +6,7 @@
 		startOfWeek,
 		today
 	} from '@internationalized/date';
+	import { page } from '$app/state';
 	import { Button } from '$lib/components/ui/button';
 	import * as Popover from '$lib/components/ui/popover';
 	import { getAmountSpentPerWeek } from '$lib/remote/transaction.remote';
@@ -16,7 +17,7 @@
 
 	let open = $state(false);
 
-	const selectedWeek = getSelectedWeek();
+	const selectedWeek = $derived(getSelectedWeek(page.url.searchParams));
 </script>
 
 <Popover.Root bind:open>

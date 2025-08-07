@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { getLocalTimeZone } from '@internationalized/date';
+	import { page } from '$app/state';
 	import * as Card from '$lib/components/ui/card';
 	import { getTransactionByWeek } from '$lib/remote/transaction.remote';
 	import { getSelectedWeek } from '$lib/state/selected-week.svelte';
@@ -15,25 +16,27 @@
 		user: string;
 	};
 
-	const selectedWeek = getSelectedWeek();
+	const selectedWeek = $derived(getSelectedWeek(page.url.searchParams));
+	let from = $derived(selectedWeek.from.toDate(getLocalTimeZone()));
+
+	let query = $derived(getTransactionByWeek(from));
 </script>
 
-<svelte:boundary>
+{#if !query.current}
 	<ul class="flex flex-col gap-2">
-		{#each await getTransactionByWeek(selectedWeek.from.toDate(getLocalTimeZone())) as transaction (transaction.id)}
+		{#each { length: 3 }}
+			<li>
+				<Skeleton class="h-[178px] rounded-xl" />
+			</li>
+		{/each}
+	</ul>
+{:else}
+	<ul class="flex flex-col gap-2">
+		{#each query.current as transaction (transaction.id)}
 			{@render card(transaction)}
 		{/each}
 	</ul>
-	{#snippet pending()}
-		<ul class="flex flex-col gap-2">
-			{#each { length: 3 }}
-				<li>
-					<Skeleton class="h-[178px] rounded-xl" />
-				</li>
-			{/each}
-		</ul>
-	{/snippet}
-</svelte:boundary>
+{/if}
 
 {#snippet card({ amount, name, paidAt, user }: Transaction)}
 	<li>

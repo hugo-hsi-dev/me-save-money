@@ -4,7 +4,11 @@ import z from 'zod';
 
 export const getBudgetByAppliesTo = query(z.date(), async (date) => {
 	const dbService = new DBService();
-	return dbService.selectBudgetByAppliesTo(date);
+	const result = await dbService.selectBudgetByAppliesTo(date);
+	if (!result) {
+		return { amount: '200.00' };
+	}
+	return result;
 });
 
 export const changeBudget = command(

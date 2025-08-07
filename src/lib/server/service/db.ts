@@ -40,6 +40,25 @@ export class DBService {
 		return this.db.insert(table.transaction).values(data).returning();
 	}
 
+	async selectAmountSpentByForWeek({ timezone, forWeek }: { timezone: string; forWeek: Date }) {
+		const week = sql`${table.transaction.forWeek} AT TIME ZONE '${sql.raw(timezone)}'`.mapWith(
+			table.transaction.forWeek
+		);
+
+		const result = await db
+			.select({
+				amount: sum(table.transaction.amount)
+			})
+			.from(table.transaction)
+			.groupBy(week)
+			.where(eq(table.transaction.forWeek, forWeek));
+
+		if (result.length === 0) {
+			return undefined;
+		}
+		return result[0];
+	}
+
 	async selectAmountSpentPerWeek(timezone: string) {
 		const week = sql`${table.transaction.forWeek} AT TIME ZONE '${sql.raw(timezone)}'`.mapWith(
 			table.transaction.forWeek
@@ -58,7 +77,10 @@ export class DBService {
 
 	async selectBudgetByAppliesTo(appliesTo: Date) {
 		const result = await this.db
-			.select({ appliesTo: table.budget.appliesTo })
+			.select({
+				amount: table.budget.amount,
+				id: table.budget.id
+			})
 			.from(table.budget)
 			.where(eq(table.budget.appliesTo, appliesTo))
 			.limit(1);
