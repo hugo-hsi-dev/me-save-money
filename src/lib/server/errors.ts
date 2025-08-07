@@ -1,6 +1,7 @@
 import { error } from '@sveltejs/kit';
 
 export const ERRORS = {
+	BAD_REQUEST: () => error(400, { message: 'Data provided could not be processed.' }),
 	FORBIDDEN: () =>
 		error(403, {
 			message: 'Access denied. You do not have permission to access this resource.'
