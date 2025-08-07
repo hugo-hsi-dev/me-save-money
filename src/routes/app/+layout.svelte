@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { isHttpError } from '@sveltejs/kit';
 	import { asset, resolve } from '$app/paths';
-	import AppHeader from '$lib/components/app-header.svelte';
+	import AppHeader from '$lib/components/header/app-header.svelte';
 	import { Button } from '$lib/components/ui/button';
 	import { setSelectedWeekContext } from '$lib/state/selected-week.svelte';
 

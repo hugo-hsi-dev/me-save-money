@@ -24,7 +24,9 @@
 {#if !amountSpentQuery.current || !totalBudgetQuery.current}
 	<Skeleton class="h-[60px] rounded" />
 {:else}
-	<span class="text-6xl font-bold">
-		{Number(totalBudgetQuery.current.amount) - Number(amountSpentQuery.current.amount)}
+	{@const remainingBudget =
+		Number(totalBudgetQuery.current.amount) - Number(amountSpentQuery.current.amount)}
+	<span class={['text-6xl font-bold', { 'text-destructive': remainingBudget < 0 }]}>
+		${remainingBudget}
 	</span>
 {/if}
