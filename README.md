@@ -27,7 +27,7 @@ npm run dev -- --open
 
 ## Linting
 
-Don't have a formatter built in? Using Codespaces for example?  
+Don't have a formatter built in? Using Codespaces for example?
 
 ```sh
 # Use this to check for import errors
