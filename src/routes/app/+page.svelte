@@ -1,6 +1,6 @@
 <script lang="ts">
+	import RemainingBudget from '$lib/components/budget/remaining-budget.svelte';
 	import TotalBudget from '$lib/components/budget/total-budget.svelte';
-	import RemainingBudget from '$lib/components/remaining-budget.svelte';
 	import AddTransactionDrawer from '$lib/components/transaction/add-transaction-drawer.svelte';
 	import TransactionList from '$lib/components/transaction/transaction-list.svelte';
 </script>

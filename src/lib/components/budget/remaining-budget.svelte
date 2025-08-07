@@ -4,7 +4,7 @@
 	import { getAmountSpentByWeek } from '$lib/remote/transaction.remote';
 	import { getSelectedWeekContext } from '$lib/state/selected-week.svelte';
 
-	import { Skeleton } from './ui/skeleton';
+	import { Skeleton } from '../ui/skeleton';
 	const selectedWeek = getSelectedWeekContext();
 
 	// [TODO] Change this query to use svelte:boundary and await
