@@ -35,9 +35,6 @@ export default ts.config(
 			parserOptions: {
 				extraFileExtensions: ['.svelte'],
 				parser: ts.parser,
-				projectService: {
-					allowDefaultProject: ['*.js', '*.ts']
-				},
 				svelteConfig
 			}
 		}
