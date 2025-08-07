@@ -29,18 +29,6 @@ export const transaction = pgTable(
 	(table) => [index('transactions_for_week_idx').on(table.forWeek)]
 );
 
-export const preset = pgTable('presets', {
-	amount: numeric({ precision: 12, scale: 2 }).notNull(),
-	createdAt: timestamp().defaultNow().notNull(),
-	id: text()
-		.primaryKey()
-		.$defaultFn(() => nanoid()),
-	name: text().notNull(),
-	updatedAt: timestamp()
-		.defaultNow()
-		.$onUpdate(() => new Date())
-});
-
 export const budget = pgTable('budget', {
 	amount: numeric({ precision: 12, scale: 2 }).notNull(),
 	appliesTo: date({ mode: 'date' }).notNull().unique(),
