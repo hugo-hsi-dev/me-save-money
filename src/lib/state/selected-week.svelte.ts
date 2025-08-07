@@ -12,23 +12,3 @@ export const setSelectedWeekContext = () =>
 	setContext<SelectedWeekState>(KEY, new SelectedWeekState());
 
 export const getSelectedWeekContext = () => getContext<SelectedWeekState>(KEY);
-
-// export function getSelectedWeek(searchParams: URLSearchParams) {
-// 	const isoFrom = searchParams.get('from');
-// 	const isoTo = searchParams.get('to');
-
-// 	return {
-// 		get from() {
-// 			if (!isoFrom || !isoTo) {
-// 				return startOfWeek(today(getLocalTimeZone()), getLocalTimeZone(), 'mon');
-// 			}
-// 			return parseDate(isoFrom);
-// 		},
-// 		get to() {
-// 			if (!isoFrom || !isoTo) {
-// 				return endOfWeek(today(getLocalTimeZone()), getLocalTimeZone(), 'mon');
-// 			}
-// 			return parseDate(isoTo);
-// 		}
-// 	};
-// }
