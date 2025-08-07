@@ -1,6 +1,4 @@
 <script lang="ts">
-	import { getLocalTimeZone } from '@internationalized/date';
-	import { page } from '$app/state';
 	import * as Card from '$lib/components/ui/card';
 	import { getTransactionByWeek } from '$lib/remote/transaction.remote';
 	import { getSelectedWeekContext } from '$lib/state/selected-week.svelte';
@@ -19,9 +17,8 @@
 	// [TODO] Change this query to use svelte:boundary and await
 	// Wait for this issue to resolve: https://github.com/sveltejs/kit/issues/14113
 	const selectedWeek = getSelectedWeekContext();
-	let from = $derived(selectedWeek.calendarDate.toDate(getLocalTimeZone()));
 
-	let query = $derived(getTransactionByWeek(from));
+	let query = $derived(getTransactionByWeek(selectedWeek.nativeDate));
 </script>
 
 {#if !query.current}
