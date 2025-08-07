@@ -40,7 +40,7 @@ export class DBService {
 		return this.db.insert(table.transaction).values(data).returning();
 	}
 
-	async selectAmountSpentByForWeek({ timezone, forWeek }: { timezone: string; forWeek: Date }) {
+	async selectAmountSpentByForWeek({ forWeek, timezone }: { forWeek: Date; timezone: string }) {
 		const week = sql`${table.transaction.forWeek} AT TIME ZONE '${sql.raw(timezone)}'`.mapWith(
 			table.transaction.forWeek
 		);

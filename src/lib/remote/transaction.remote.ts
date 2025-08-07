@@ -1,5 +1,4 @@
 import { form, query } from '$app/server';
-import { sleep } from '$lib';
 import { addTransactionSchema } from '$lib/components/add-transaction-form.svelte';
 import { ERRORS } from '$lib/server/errors';
 import { DBService } from '$lib/server/service/db';

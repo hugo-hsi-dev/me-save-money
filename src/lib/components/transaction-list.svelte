@@ -16,6 +16,8 @@
 		user: string;
 	};
 
+	// [TODO] Change this query to use svelte:boundary and await
+	// Wait for this issue to resolve: https://github.com/sveltejs/kit/issues/14113
 	const selectedWeek = $derived(getSelectedWeek(page.url.searchParams));
 	let from = $derived(selectedWeek.from.toDate(getLocalTimeZone()));
 
