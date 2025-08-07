@@ -3,7 +3,7 @@
 	import { page } from '$app/state';
 	import * as Card from '$lib/components/ui/card';
 	import { getTransactionByWeek } from '$lib/remote/transaction.remote';
-	import { getSelectedWeek } from '$lib/state/selected-week.svelte';
+	import { getSelectedWeekContext } from '$lib/state/selected-week.svelte';
 
 	import { Badge } from './ui/badge';
 	import { Skeleton } from './ui/skeleton';
@@ -18,8 +18,8 @@
 
 	// [TODO] Change this query to use svelte:boundary and await
 	// Wait for this issue to resolve: https://github.com/sveltejs/kit/issues/14113
-	const selectedWeek = $derived(getSelectedWeek(page.url.searchParams));
-	let from = $derived(selectedWeek.from.toDate(getLocalTimeZone()));
+	const selectedWeek = getSelectedWeekContext();
+	let from = $derived(selectedWeek.calendarDate.toDate(getLocalTimeZone()));
 
 	let query = $derived(getTransactionByWeek(from));
 </script>

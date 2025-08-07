@@ -2,17 +2,17 @@
 	import { getLocalTimeZone } from '@internationalized/date';
 	import { page } from '$app/state';
 	import { getBudgetByAppliesTo } from '$lib/remote/budget.remote';
-	import { getSelectedWeek } from '$lib/state/selected-week.svelte';
+	import { getSelectedWeekContext } from '$lib/state/selected-week.svelte';
 
 	import { Badge } from './ui/badge';
 	import { Skeleton } from './ui/skeleton';
 
-	const selectedWeek = $derived(getSelectedWeek(page.url.searchParams));
+	const selectedWeek = getSelectedWeekContext();
 
 	// [TODO] Change this query to use svelte:boundary and await
 	// Wait for this issue to resolve: https://github.com/sveltejs/kit/issues/14113
 	let totalBudgetQuery = $derived(
-		getBudgetByAppliesTo(selectedWeek.from.toDate(getLocalTimeZone()))
+		getBudgetByAppliesTo(selectedWeek.calendarDate.toDate(getLocalTimeZone()))
 	);
 </script>
 
