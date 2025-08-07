@@ -30,9 +30,11 @@ export const transaction = pgTable(
 );
 
 export const preset = pgTable('presets', {
-	amount: numeric({ precision: 12, scale: 2 }),
+	amount: numeric({ precision: 12, scale: 2 }).notNull(),
 	createdAt: timestamp().defaultNow().notNull(),
-	id: text().primaryKey().default(nanoid()),
+	id: text()
+		.primaryKey()
+		.$defaultFn(() => nanoid()),
 	name: text().notNull(),
 	updatedAt: timestamp()
 		.defaultNow()
@@ -41,9 +43,11 @@ export const preset = pgTable('presets', {
 
 export const budget = pgTable('budget', {
 	amount: numeric({ precision: 12, scale: 2 }).notNull(),
-	appliesTo: date({ mode: 'date' }).notNull(),
+	appliesTo: date({ mode: 'date' }).notNull().unique(),
 	createdAt: timestamp().defaultNow().notNull(),
-	id: text().primaryKey().default(nanoid()),
+	id: text()
+		.primaryKey()
+		.$defaultFn(() => nanoid()),
 	updatedAt: timestamp()
 		.defaultNow()
 		.$onUpdate(() => new Date())

@@ -18,8 +18,12 @@ export class DBService {
 		return await this.db.delete(table.session).where(eq(table.session.id, id)).returning();
 	}
 
-	async insertBudget(data: { amount: string; appliesTo: Date }) {
-		return await this.db.insert(table.budget).values(data).returning();
+	async insertOrUpdateBudget(data: { amount: string; appliesTo: Date }) {
+		return await this.db
+			.insert(table.budget)
+			.values(data)
+			.onConflictDoUpdate({ set: data, target: table.budget.appliesTo })
+			.returning();
 	}
 
 	async insertPreset(data: { amount: string; name: string }) {
@@ -122,10 +126,6 @@ export class DBService {
 			})
 			.from(table.transaction)
 			.where(eq(table.transaction.forWeek, week));
-	}
-
-	async updateBudget({ id, ...data }: { amount?: string; id: string }) {
-		return this.db.update(table.budget).set(data).where(eq(table.budget.id, id)).returning();
 	}
 
 	async updatePreset({ id, ...data }: { amount?: string; id: string; name?: string }) {
