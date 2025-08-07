@@ -10,10 +10,6 @@ export class DBService {
 		this.db = dbClient;
 	}
 
-	async deletePreset(id: string) {
-		return await this.db.delete(table.preset).where(eq(table.preset.id, id)).returning();
-	}
-
 	async deleteSession(id: string) {
 		return await this.db.delete(table.session).where(eq(table.session.id, id)).returning();
 	}
@@ -24,10 +20,6 @@ export class DBService {
 			.values(data)
 			.onConflictDoUpdate({ set: data, target: table.budget.appliesTo })
 			.returning();
-	}
-
-	async insertPreset(data: { amount: string; name: string }) {
-		return await this.db.insert(table.preset).values(data).returning();
 	}
 
 	async insertSession(data: { expiresAt: Date; id: string; user: User }) {
@@ -109,12 +101,6 @@ export class DBService {
 		return result[0];
 	}
 
-	async selectPresets() {
-		return await this.db
-			.select({ amount: table.preset.amount, id: table.preset.id, name: table.preset.name })
-			.from(table.preset);
-	}
-
 	async selectTransactionsByForWeek(week: Date) {
 		return await this.db
 			.select({
@@ -126,10 +112,6 @@ export class DBService {
 			})
 			.from(table.transaction)
 			.where(eq(table.transaction.forWeek, week));
-	}
-
-	async updatePreset({ id, ...data }: { amount?: string; id: string; name?: string }) {
-		return this.db.update(table.preset).set(data).where(eq(table.session.id, id)).returning();
 	}
 
 	async updateSessionById({ id, ...data }: { expiresAt?: Date; id: string; user?: User }) {
