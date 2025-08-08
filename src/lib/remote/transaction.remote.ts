@@ -1,5 +1,6 @@
-import { form, query } from '$app/server';
+import { command, form, query } from '$app/server';
 import { addTransactionSchema } from '$lib/components/transaction/add-transaction-form.svelte';
+import { changeTransactionSchema } from '$lib/components/transaction/edit-transaction-form.svelte';
 import { ERRORS } from '$lib/server/errors';
 import { DBService } from '$lib/server/service/db';
 import { LocalsService } from '$lib/server/service/locals';
@@ -19,6 +20,19 @@ export const createNewTransaction = form(async (formData) => {
 
 	await dbService.insertTransaction({ ...result.data, user: localsService.validateSession().user });
 });
+
+export const changeTransaction = form(async (formData) => {
+	const data = Object.fromEntries(formData.entries());
+	
+	const validateResult = changeTransactionSchema.safeParse(data);
+
+	if (!validateResult.success) {
+		return ERRORS.BAD_REQUEST();
+	}
+	const dbService = new DBService();
+
+	await dbService.updateTransaction(validateResult.data);
+})
 
 export const getTransactionByWeek = query(z.date(), async (date) => {
 	// await sleep();

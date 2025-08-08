@@ -5,6 +5,7 @@
 
 	import { Badge } from '../ui/badge';
 	import { Skeleton } from '../ui/skeleton';
+	import TransactionContextMenu from './transaction-context-menu.svelte';
 
 	type Transaction = {
 		amount: string;
@@ -32,7 +33,11 @@
 {:else}
 	<ul class="flex flex-col gap-2">
 		{#each query.current as transaction (transaction.id)}
-			{@render card(transaction)}
+			<TransactionContextMenu {transaction}>
+				{#snippet child({props})}
+					<div {...props}>{@render card(transaction)}</div>
+				{/snippet}
+			</TransactionContextMenu>
 		{/each}
 	</ul>
 {/if}

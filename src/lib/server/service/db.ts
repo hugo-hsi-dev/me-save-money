@@ -116,4 +116,8 @@ export class DBService {
 	async updateSessionById({ id, ...data }: { expiresAt?: Date; id: string; user?: User }) {
 		return this.db.update(table.session).set(data).where(eq(table.session.id, id)).returning();
 	}
+
+	async updateTransaction({id, ...data}: {amount: string; id: string, name: string}) {
+		return this.db.update(table.transaction).set(data).where(eq(table.transaction.id, id));
+	}
 }
