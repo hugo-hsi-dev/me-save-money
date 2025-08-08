@@ -43,15 +43,14 @@ export class DBService {
 
 		const result = await db
 			.select({
-				amount: sum(table.transaction.amount)
+				amount: sql<string>`COALESCE(${sum(table.transaction.amount)}, '0')`
 			})
 			.from(table.transaction)
 			.groupBy(week)
-			.where(eq(table.transaction.forWeek, forWeek));
+			.where(eq(table.transaction.forWeek, forWeek))
+			.limit(1);
 
-		if (result.length === 0) {
-			return undefined;
-		}
+		if (result.length === 0) return undefined;
 		return result[0];
 	}
 
@@ -62,7 +61,7 @@ export class DBService {
 
 		const result = await db
 			.select({
-				amount: sum(table.transaction.amount),
+				amount: sql<string>`COALESCE(${sum(table.transaction.amount)}, '0')`,
 				week
 			})
 			.from(table.transaction)

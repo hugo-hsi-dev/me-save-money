@@ -2,7 +2,7 @@ export class WeekService {
 	// Groups the data by year and nests the data one layer down
 	groupAmountSpentByYear(
 		data: {
-			amount: null | string;
+			amount: string;
 			week: Date;
 		}[]
 	) {
