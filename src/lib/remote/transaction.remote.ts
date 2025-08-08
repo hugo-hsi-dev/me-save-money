@@ -32,7 +32,8 @@ export const getAmountSpentByWeek = query(
 	async ({ forWeek, timezone }) => {
 		// await sleep();
 		const dbService = new DBService();
-		const result = dbService.selectAmountSpentByForWeek({ forWeek, timezone });
+		const result = await dbService.selectAmountSpentByForWeek({ forWeek, timezone });
+		if (!result) return { amount: '0' };
 		return result;
 	}
 );
