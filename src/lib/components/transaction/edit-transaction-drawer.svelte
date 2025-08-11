@@ -1,22 +1,19 @@
 <script lang="ts">
 	import * as Drawer from '$lib/components/ui/drawer';
 
+	import type { Transaction } from './transaction-list.svelte';
+
 	import FormAmountField from '../reusable-fields/form-amount-field.svelte';
 	import FormNameField from '../reusable-fields/form-name-field.svelte';
 	import { Button } from '../ui/button';
 	import EditTransactionForm from './edit-transaction-form.svelte';
 
-	export type Transaction = {
-		amount: string;
-		name: string;
-		id: string
-	}
-
 	let {
-		open = $bindable(), transaction
+		open = $bindable(),
+		transaction
 	}: {
 		open: boolean;
-		transaction: Transaction
+		transaction: Transaction;
 	} = $props();
 </script>
 

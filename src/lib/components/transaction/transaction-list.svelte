@@ -1,3 +1,14 @@
+<script lang="ts" module>
+	export type Transaction = {
+		amount: string;
+		forWeek: Date;
+		id: string;
+		name: string;
+		paidAt: Date;
+		user: string;
+	};
+</script>
+
 <script lang="ts">
 	import * as Card from '$lib/components/ui/card';
 	import { getTransactionByWeek } from '$lib/remote/transaction.remote';
@@ -6,14 +17,6 @@
 	import { Badge } from '../ui/badge';
 	import { Skeleton } from '../ui/skeleton';
 	import TransactionContextMenu from './transaction-context-menu.svelte';
-
-	type Transaction = {
-		amount: string;
-		id: string;
-		name: string;
-		paidAt: Date;
-		user: string;
-	};
 
 	// [TODO] Change this query to use svelte:boundary and await
 	// Wait for this issue to resolve: https://github.com/sveltejs/kit/issues/14113
@@ -34,7 +37,7 @@
 	<ul class="flex flex-col gap-2">
 		{#each query.current as transaction (transaction.id)}
 			<TransactionContextMenu {transaction}>
-				{#snippet child({props})}
+				{#snippet child({ props })}
 					<div {...props}>{@render card(transaction)}</div>
 				{/snippet}
 			</TransactionContextMenu>

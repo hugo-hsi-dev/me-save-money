@@ -1,6 +1,6 @@
 <script lang="ts">
-	let {input = "0"} = $props();
-	let value = $state(Number(input)*100);
+	let { input = '0' } = $props();
+	let value = $state(Number(input) * 100);
 	let formattedValue = $derived((value / 100).toFixed(2));
 	let componentId = $props.id();
 	let isFocused = $state(false);

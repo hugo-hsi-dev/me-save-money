@@ -1,7 +1,7 @@
 <script lang="ts" module>
 	export const changeTransactionSchema = z.object({
-		id: z.string(),
 		amount: z.string().refine((amount) => !isNaN(Number(amount))),
+		id: z.string(),
 		name: z.string()
 	});
 </script>

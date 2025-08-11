@@ -23,7 +23,7 @@ export const createNewTransaction = form(async (formData) => {
 
 export const changeTransaction = form(async (formData) => {
 	const data = Object.fromEntries(formData.entries());
-	
+
 	const validateResult = changeTransactionSchema.safeParse(data);
 
 	if (!validateResult.success) {
@@ -32,7 +32,14 @@ export const changeTransaction = form(async (formData) => {
 	const dbService = new DBService();
 
 	await dbService.updateTransaction(validateResult.data);
-})
+});
+
+export const deleteTransaction = command(z.object({ id: z.string() }), async ({ id }) => {
+	const dbService = new DBService();
+
+	const transaction = await dbService.deleteTransaction(id);
+	if (transaction.length > 0) await getTransactionByWeek(transaction[0].forWeek).refresh();
+});
 
 export const getTransactionByWeek = query(z.date(), async (date) => {
 	// await sleep();

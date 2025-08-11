@@ -14,6 +14,10 @@ export class DBService {
 		return await this.db.delete(table.session).where(eq(table.session.id, id)).returning();
 	}
 
+	async deleteTransaction(id: string) {
+		return await this.db.delete(table.transaction).where(eq(table.transaction.id, id)).returning();
+	}
+
 	async insertOrUpdateBudget(data: { amount: string; appliesTo: Date }) {
 		return await this.db
 			.insert(table.budget)
@@ -104,6 +108,7 @@ export class DBService {
 		return await this.db
 			.select({
 				amount: table.transaction.amount,
+				forWeek: table.transaction.forWeek,
 				id: table.transaction.id,
 				name: table.transaction.name,
 				paidAt: table.transaction.paidAt,
@@ -117,7 +122,7 @@ export class DBService {
 		return this.db.update(table.session).set(data).where(eq(table.session.id, id)).returning();
 	}
 
-	async updateTransaction({id, ...data}: {amount: string; id: string, name: string}) {
+	async updateTransaction({ id, ...data }: { amount: string; id: string; name: string }) {
 		return this.db.update(table.transaction).set(data).where(eq(table.transaction.id, id));
 	}
 }
