@@ -27,6 +27,6 @@
 	{@const remainingBudget =
 		Number(totalBudgetQuery.current.amount) - Number(amountSpentQuery.current.amount)}
 	<span class={['text-6xl font-bold', { 'text-destructive': remainingBudget < 0 }]}>
-		${remainingBudget}
+		${remainingBudget.toFixed(2)}
 	</span>
 {/if}
