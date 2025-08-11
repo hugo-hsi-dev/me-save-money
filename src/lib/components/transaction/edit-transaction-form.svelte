@@ -10,14 +10,12 @@
 	import type { Snippet } from 'svelte';
 
 	import { changeTransaction } from '$lib/remote/transaction.remote';
-	import { getSelectedWeekContext } from '$lib/state/selected-week.svelte';
 	import z from 'zod';
 	let {
 		children,
-		drawerOpen = $bindable()
-	}: { children: Snippet; drawerOpen: boolean; id?: string } = $props();
-
-	const selectedWeek = getSelectedWeekContext();
+		drawerOpen = $bindable(),
+		id
+	}: { children: Snippet; drawerOpen: boolean; id: string } = $props();
 </script>
 
 <form
@@ -27,11 +25,11 @@
 			// await submit().updates(getBudgetByAppliesTo(selectedWeek.nativeDate));
 			await submit();
 			drawerOpen = false;
-		} catch {
-			console.error('something went wrong');
+		} catch (e) {
+			console.error('something went wrong', e);
 		}
 	})}
 >
-	<input type="hidden" name="appliesTo" value={selectedWeek.nativeDate} />
+	<input type="hidden" name="id" value={id} />
 	{@render children()}
 </form>

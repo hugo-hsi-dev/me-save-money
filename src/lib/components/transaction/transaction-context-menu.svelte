@@ -27,7 +27,7 @@
 <ContextMenu.Root>
 	<ContextMenu.Trigger {child}></ContextMenu.Trigger>
 	<ContextMenu.Content>
-		<ContextMenu.Label>Total Budget</ContextMenu.Label>
+		<ContextMenu.Label>{transaction.name}</ContextMenu.Label>
 		<ContextMenu.Separator />
 
 		<ContextMenu.Item onclick={() => (open = true)}>
