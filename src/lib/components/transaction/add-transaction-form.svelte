@@ -1,8 +1,8 @@
 <script lang="ts" module>
 	export const addTransactionSchema = z.object({
-		amount: z.string().refine((amount) => !isNaN(Number(amount))),
+		amount: z.string().refine((amount) => !isNaN(Number(amount))).min(1),
 		id: z.nanoid(),
-		name: z.string(),
+		name: z.string().min(1),
 		paidAt: z.string().transform((input) => new Date(input))
 	});
 </script>
@@ -19,15 +19,12 @@
 <form
 	{...createNewTransaction.enhance(async ({ submit }) => {
 		try {
-			// const data = Object.fromEntries(formData.entries());
-			// const validatedData = addTransactionSchema.parse(data);
 			await submit();
 			drawerOpen = false;
 		} catch {
 			console.error('something went wrong');
 		}
-	})}
->
+	})}>
 	<input type="hidden" value={nanoid()} name="id" />
 	{@render children()}
 </form>

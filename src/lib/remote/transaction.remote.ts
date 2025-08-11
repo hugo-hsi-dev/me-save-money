@@ -19,6 +19,7 @@ export const createNewTransaction = form(async (formData) => {
 	const localsService = new LocalsService();
 
 	await dbService.insertTransaction({ ...result.data, user: localsService.validateSession().user });
+	return {yeah: true};
 });
 
 export const changeTransaction = form(async (formData) => {
