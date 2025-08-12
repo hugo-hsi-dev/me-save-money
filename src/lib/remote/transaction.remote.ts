@@ -12,14 +12,14 @@ export const createNewTransaction = form(async (formData) => {
 	const result = addTransactionSchema.safeParse(rawData);
 
 	if (!result.success) {
-		return ERRORS.INTERNAL_SERVER_ERROR;
+		return {error: result.error.issues, success: false};
 	}
 
 	const dbService = new DBService();
 	const localsService = new LocalsService();
 
 	await dbService.insertTransaction({ ...result.data, user: localsService.validateSession().user });
-	return {yeah: true};
+	return {error: undefined, success: true};
 });
 
 export const changeTransaction = form(async (formData) => {

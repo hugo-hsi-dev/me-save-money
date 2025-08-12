@@ -3,6 +3,7 @@ import type { User } from '$lib/config';
 import { db, type DBClient } from '$lib/server/db';
 import * as table from '$lib/server/db/schema';
 import { eq, sql, sum } from 'drizzle-orm';
+import { nanoid } from 'nanoid';
 
 export class DBService {
 	private db: DBClient;
@@ -32,12 +33,11 @@ export class DBService {
 
 	async insertTransaction(data: {
 		amount: string;
-		id: string;
 		name: string;
 		paidAt: Date;
 		user: User;
 	}) {
-		return this.db.insert(table.transaction).values(data).returning();
+		return this.db.insert(table.transaction).values({id: nanoid(), ...data}).returning();
 	}
 
 	async selectAmountSpentByForWeek({ forWeek, timezone }: { forWeek: Date; timezone: string }) {
