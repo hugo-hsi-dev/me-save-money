@@ -1,7 +1,7 @@
 <script lang="ts" module>
 	export const addTransactionSchema = z.object({
 		amount: z.string().min(1).refine((amount) => !isNaN(Number(amount))),
-		name: z.string().min(1),
+		name: z.string().min(3, "Transaction name must be at least 3 characters long"),
 		paidAt: z.string().transform((input) => new Date(input))
 	});
 </script>
