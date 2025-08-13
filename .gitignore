@@ -1,6 +1,23 @@
-# This is the .gitignore file
+node_modules
 
-# Ignore environment files
+# Output
+.output
+.vercel
+.netlify
+.wrangler
+/.svelte-kit
+/build
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Env
 .env
-.env.local
+.env.*
+!.env.example
 .env.test
+
+# Vite
+vite.config.js.timestamp-*
+vite.config.ts.timestamp-*
