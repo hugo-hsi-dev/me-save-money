@@ -31,13 +31,11 @@ export class DBService {
 		return await this.db.insert(table.session).values(data).returning();
 	}
 
-	async insertTransaction(data: {
-		amount: string;
-		name: string;
-		paidAt: Date;
-		user: User;
-	}) {
-		return this.db.insert(table.transaction).values({id: nanoid(), ...data}).returning();
+	async insertTransaction(data: { amount: string; name: string; paidAt: Date; user: User }) {
+		return this.db
+			.insert(table.transaction)
+			.values({ id: nanoid(), ...data })
+			.returning();
 	}
 
 	async selectAmountSpentByForWeek({ forWeek, timezone }: { forWeek: Date; timezone: string }) {

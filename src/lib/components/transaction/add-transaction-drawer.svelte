@@ -26,7 +26,7 @@
 		<!-- BG Override -->
 		<div class="mt-2 rounded-t-3xl border-t bg-background">
 			<AddTransactionForm bind:drawerOpen={open}>
-				{#snippet children({supererror})}		
+				{#snippet children({ supererror })}
 					<!-- New Header Container -->
 					<div class="flex items-center justify-between p-2 pt-3">
 						<Drawer.Close>
@@ -40,8 +40,8 @@
 						<Button variant="link" class="text-lg font-bold" type="submit">Done</Button>
 					</div>
 					<div class="mb-6 flex flex-col gap-6 px-6">
-						<FormAmountField error={supererror?.find((e) => e.path[0] === "amount")?.message} />
-						<FormNameField error={supererror?.find((e) => e.path[0] === "name")?.message} />
+						<FormAmountField error={supererror?.find((e) => e.path[0] === 'amount')?.message} />
+						<FormNameField error={supererror?.find((e) => e.path[0] === 'name')?.message} />
 						<AddTransactionPaidAtField />
 					</div>
 				{/snippet}

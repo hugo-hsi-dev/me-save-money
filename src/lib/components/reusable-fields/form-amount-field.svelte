@@ -1,5 +1,5 @@
 <script lang="ts">
-	let { input = '0', error }: {input?: string, error: string | undefined} = $props();
+	let { error, input = '0' }: { error?: string | undefined; input?: string } = $props();
 	let value = $state(Number(input) * 100);
 	let formattedValue = $derived((value / 100).toFixed(2));
 	let componentId = $props.id();
@@ -19,6 +19,6 @@
 			inputmode="numeric"
 			class="size-0 opacity-0"
 		/>
-		<p class="text-destructive font-thin">{error}</p>
+		<p class="font-thin text-destructive">{error}</p>
 	</label>
 </div>
