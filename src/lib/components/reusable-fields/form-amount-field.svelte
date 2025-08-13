@@ -1,5 +1,5 @@
 <script lang="ts">
-	let { input = '0' } = $props();
+	let { error, input = '0' }: { error?: string | undefined; input?: string } = $props();
 	let value = $state(Number(input) * 100);
 	let formattedValue = $derived((value / 100).toFixed(2));
 	let componentId = $props.id();
@@ -10,7 +10,6 @@
 	<input type="hidden" value={formattedValue} name="amount" />
 	<label for="amount-field-{componentId}">
 		<span class={['text-7xl font-bold', { 'text-primary': isFocused }]}>${formattedValue}</span>
-
 		<input
 			type="text"
 			bind:value
@@ -20,5 +19,6 @@
 			inputmode="numeric"
 			class="size-0 opacity-0"
 		/>
+		<p class="font-thin text-destructive">{error}</p>
 	</label>
 </div>
