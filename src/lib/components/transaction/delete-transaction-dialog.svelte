@@ -2,14 +2,16 @@
 	import { Button } from '$lib/components/ui/button/index.js';
 	import * as Dialog from '$lib/components/ui/dialog/index.js';
 	import { deleteTransaction, getTransactionByWeek } from '$lib/remote/transaction.remote';
+	import { getSelectedWeekContext } from '$lib/state/selected-week.svelte';
 	let {
-		forWeek,
 		id,
 		name,
 		open = $bindable()
 	}: { forWeek: Date; id: string; name: string; open: boolean } = $props();
+	const selectedWeek = getSelectedWeekContext();
+
 	const deleteIt = async () => {
-		await deleteTransaction({ id }).updates(getTransactionByWeek(forWeek));
+		await deleteTransaction({ id }).updates(getTransactionByWeek(selectedWeek.nativeDate));
 		open = false;
 	};
 </script>

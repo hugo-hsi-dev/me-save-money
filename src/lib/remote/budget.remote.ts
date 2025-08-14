@@ -24,7 +24,7 @@ export const changeBudget = form(async (formData) => {
 		return ERRORS.BAD_REQUEST();
 	}
 
-	console.log(validateResult.data);
+	//console.log(validateResult.data);
 	const insertResult = await dbService.insertOrUpdateBudget(validateResult.data);
 
 	await getBudgetByAppliesTo(insertResult[0].appliesTo).refresh();

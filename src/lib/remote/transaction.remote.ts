@@ -46,7 +46,7 @@ export const getTransactionByWeek = query(z.date(), async (date) => {
 	// await sleep();
 	const dbService = new DBService();
 	const data = await dbService.selectTransactionsByForWeek(date);
-	return data;
+	return data.sort((a, b) => a.paidAt.getTime() - b.paidAt.getTime());
 });
 
 export const getAmountSpentByWeek = query(
