@@ -27,6 +27,9 @@
 		if (submitted) error = createNewTransaction.result?.error;
 	});
 	$effect(() => {
+		if (!error && submitted) drawerOpen = false;
+	});
+	$effect(() => {
 		if (!drawerOpen) {
 			error = undefined;
 			submitted = false;
@@ -51,7 +54,6 @@
 		{...createNewTransaction.enhance(async ({ submit }) => {
 			try {
 				loading = true;
-				await sleep(2000);
 				await submit();
 				submitted = true;
 			} finally {
