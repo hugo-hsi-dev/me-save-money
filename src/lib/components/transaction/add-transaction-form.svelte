@@ -12,7 +12,6 @@
 <script lang="ts">
 	import type { Snippet } from 'svelte';
 
-	import { sleep } from '$lib';
 	import { createNewTransaction } from '$lib/remote/transaction.remote';
 	import z from 'zod';
 	let {
