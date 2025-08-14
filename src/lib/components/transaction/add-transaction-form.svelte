@@ -12,7 +12,6 @@
 <script lang="ts">
 	import type { Snippet } from 'svelte';
 
-	import { sleep } from '$lib';
 	import { createNewTransaction } from '$lib/remote/transaction.remote';
 	import z from 'zod';
 	let {
@@ -25,6 +24,9 @@
 	let loading = $state(false);
 	$effect(() => {
 		if (submitted) error = createNewTransaction.result?.error;
+	});
+	$effect(() => {
+		if (!error && submitted) drawerOpen = false;
 	});
 	$effect(() => {
 		if (!drawerOpen) {
@@ -51,7 +53,6 @@
 		{...createNewTransaction.enhance(async ({ submit }) => {
 			try {
 				loading = true;
-				await sleep(2000);
 				await submit();
 				submitted = true;
 			} finally {
