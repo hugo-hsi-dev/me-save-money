@@ -1,10 +1,14 @@
 <script lang="ts">
+    import * as Card from "$lib/components/ui/card/index.js";
     import * as Chart from "$lib/components/ui/chart/index.js";
 	import { getBudgetByAppliesTo } from "$lib/remote/budget.remote";
 	import { getAmountSpentPerWeek } from "$lib/remote/transaction.remote";
 	import { getLocalTimeZone } from "@internationalized/date";
     import { scaleBand } from "d3-scale";
-    import { BarChart } from "layerchart";
+    import { BarChart, type ChartContextValue } from "layerchart";
+    import { cubicInOut } from "svelte/easing";
+
+    let context = $state<ChartContextValue>();
 
     const getSpent = async () => {
         // Fetch the spent amount for the week
@@ -13,59 +17,96 @@
             return {
                 weeks: await Promise.all(data.weeks.map(async (week) => ({
                     week: week.week,
-                    budget: await (async () => {
+                    budget: Math.max(0, Number(await (async () => {
                         const budget = await getBudgetByAppliesTo(week.week);
                         return budget ? budget.amount : "0";
-                        })(),
-                    cost: week.amount
+                        })()) - Number(week.amount)),
+                    cost: Number(week.amount)
                 }))),
                 year: data.year
             };
         }));
+        console.log(data)
         return data[0].weeks;
     };
     
     const chartConfig = {
-        budget: {
-            label: "Budget",
-            color: "#2563eb"
-        },
         cost: {
             label: "Cost",
-            color: "#60a5fa"
+            color: "#FF0000"
+        },
+        budget: {
+            label: "Budget",
+            color: "#60a5f5"
         }
     } satisfies Chart.ChartConfig;
 </script>
  
-<Chart.Container config={chartConfig} class="min-h-[100px] w-full">
-    <svelte:boundary>
-        {#await getSpent()}
-            <p>Loading</p>
-        {:then chartData}
+<Card.Root>
+    <Card.Header>
+        <Card.Title>Budget Over Time</Card.Title>
+    </Card.Header>
+    <Card.Content>
+        <svelte:boundary>
+            {#await getSpent()}
+                <p>Loading</p>
+            {:then chartData}
+    
+                <Chart.Container config={chartConfig}>
                 <BarChart
-                data={chartData}
-                xScale={scaleBand().padding(0.25)}
-                x="week"
-                axis="x"
-                y="cost"
-                seriesLayout="group"
-                tooltip={false}
-                series={[
-                {
-                    key: "budget",
-                    label: chartConfig.budget.label,
-                    color: chartConfig.budget.color
-                },
-                {
-                    key: "cost",
-                    label: chartConfig.cost.label,
-                    color: chartConfig.cost.color
-                }
-                ]}
-                />
-        {:catch error}
-            <div>Error: {error.message}</div>
-        {/await}
-    </svelte:boundary>
-
-</Chart.Container>
+                    data={chartData}
+                    xScale={scaleBand().padding(0.25)}
+                    x="week"
+                    axis="x"
+                    rule={false}
+                    series={[
+                    {
+                        key: "cost",
+                        label: "Cost",
+                        color: chartConfig.cost.color,
+                        props: { rounded: "bottom" },
+                    },
+                    {
+                        key: "budget",
+                        label: "Budget",
+                        color: chartConfig.budget.color,
+                    },
+                    ]}
+                    seriesLayout="stack"
+                    grid={false}
+                    highlight={false}
+                    props={{
+                    bars: {
+                        stroke: "none",
+                        initialY: context?.height,
+                        initialHeight: 0,
+                        motion: {
+                        y: { type: "tween", duration: 500, easing: cubicInOut },
+                        height: { type: "tween", duration: 500, easing: cubicInOut },
+                        },
+                    },
+                    xAxis: {
+                        format: (d) =>
+                        new Date(d).toLocaleDateString("en-US", {
+                            weekday: "short",
+                        }),
+                        tickLabelProps: {
+                        svgProps: {
+                            y: 13,
+                        },
+                        },
+                    },
+                    }}
+                >
+                    {#snippet tooltip()}
+                        <Chart.Tooltip />
+                    {/snippet}
+                </BarChart>
+                </Chart.Container>
+    
+            {:catch error}
+                <div>Error: {error.message}</div>
+            {/await}
+        </svelte:boundary>
+    </Card.Content>
+</Card.Root>
