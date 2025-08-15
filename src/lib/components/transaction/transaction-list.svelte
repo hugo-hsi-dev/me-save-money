@@ -33,6 +33,8 @@
 			</li>
 		{/each}
 	</ul>
+{:else if query.current.length <= 0}
+	<p class="text-center font-thin text-muted-foreground">No transactions found...</p>
 {:else}
 	<ul class="flex flex-col gap-2">
 		{#each query.current as transaction (transaction.id)}
