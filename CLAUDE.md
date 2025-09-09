@@ -48,6 +48,7 @@ This is a **SvelteKit** money management application with the following stack:
 ### Database Schema
 
 Three main tables:
+
 - `session` - User sessions with expiry
 - `transactions` - Financial transactions with automatic week calculation
 - `budget` - Weekly budget allocations
