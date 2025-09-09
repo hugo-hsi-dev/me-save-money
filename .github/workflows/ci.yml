@@ -7,7 +7,6 @@ on:
   pull_request:
 
 env:
-  DATABASE_URL: ${{vars.DATABASE_URL}}
   PIN: ${{vars.PIN}}
 
 # cancel in-progress runs on new commits to same PR (gitub.event.number)
@@ -45,5 +44,4 @@ jobs:
           node-version: 22
           cache: pnpm
       - run: pnpm install --frozen-lockfile
-      - run: pnpm db:push --force
       - run: pnpm run test
