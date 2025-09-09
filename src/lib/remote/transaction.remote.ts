@@ -1,6 +1,5 @@
 import { command, form, getRequestEvent, query } from '$app/server';
-import { addTransactionSchema } from '$lib/components/transaction/add-transaction-form.svelte';
-import { changeTransactionSchema } from '$lib/components/transaction/edit-transaction-form.svelte';
+import { addTransactionSchema, changeTransactionSchema } from '$lib/schemas/transaction';
 import { db } from '$lib/server/db';
 import * as table from '$lib/server/db/schema';
 import { ERRORS } from '$lib/server/errors';

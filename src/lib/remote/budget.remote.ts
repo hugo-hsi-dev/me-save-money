@@ -1,5 +1,5 @@
 import { form, query } from '$app/server';
-import { changeBudgetSchema } from '$lib/components/budget/edit-budget-form.svelte';
+import { changeBudgetSchema } from '$lib/schemas/budget';
 import { db } from '$lib/server/db';
 import * as table from '$lib/server/db/schema';
 import { ERRORS } from '$lib/server/errors';

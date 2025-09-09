@@ -1,16 +1,7 @@
-<script lang="ts" module>
-	export const changeTransactionSchema = z.object({
-		amount: z.string().refine((amount) => !isNaN(Number(amount))),
-		id: z.string(),
-		name: z.string()
-	});
-</script>
-
 <script lang="ts">
 	import type { Snippet } from 'svelte';
 
 	import { changeTransaction } from '$lib/remote/transaction.remote';
-	import z from 'zod';
 	let {
 		children,
 		drawerOpen = $bindable(),
