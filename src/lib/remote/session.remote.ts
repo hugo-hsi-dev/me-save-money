@@ -1,10 +1,13 @@
 import { error } from '@sveltejs/kit';
-import { command } from '$app/server';
+import { command, getRequestEvent } from '$app/server';
 import { PIN } from '$env/static/private';
-import { CookiesService } from '$lib/server/service/cookies';
-import { DBService } from '$lib/server/service/db';
-import { SessionService } from '$lib/server/service/session';
-import { UserService } from '$lib/server/service/user';
+import { db } from '$lib/server/db';
+import * as table from '$lib/server/db/schema';
+import {
+	generateSessionExpiration,
+	generateSessionToken,
+	hashSessionToken
+} from '$lib/server/utils/session-tokens';
 import z from 'zod';
 
 export const signIn = command(
@@ -18,17 +21,21 @@ export const signIn = command(
 			error(401, 'Invalid PIN');
 		}
 
-		const sessionService = new SessionService();
-		const dbService = new DBService();
-		const cookieService = new CookiesService();
+		const token = generateSessionToken();
+		const id = hashSessionToken(token);
+		const expiresAt = generateSessionExpiration();
+		const user = 'Cassie';
 
-		const token = sessionService.generateNewToken();
-		const id = sessionService.getIdFromToken(token);
-		const expiresAt = sessionService.generateNewExpiration();
-		const user = UserService.getDefaultUser();
+		const cookies = getRequestEvent().cookies;
+		cookies.set('session', token, {
+			expires: expiresAt,
+			httpOnly: true,
+			path: '/',
+			sameSite: 'lax',
+			secure: import.meta.env.PROD
+		});
 
-		cookieService.setSessionToken({ expiresAt, token });
-		await dbService.insertSession({ expiresAt, id, user });
+		await db.insert(table.session).values({ expiresAt, id, user });
 
 		return { ok: true };
 	}

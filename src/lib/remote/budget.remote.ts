@@ -1,21 +1,28 @@
 import { form, query } from '$app/server';
 import { changeBudgetSchema } from '$lib/components/budget/edit-budget-form.svelte';
+import { db } from '$lib/server/db';
+import * as table from '$lib/server/db/schema';
 import { ERRORS } from '$lib/server/errors';
-import { DBService } from '$lib/server/service/db';
+import { eq } from 'drizzle-orm';
 import z from 'zod';
 
 export const getBudgetByAppliesTo = query(z.date(), async (date) => {
-	const dbService = new DBService();
-	const result = await dbService.selectBudgetByAppliesTo(date);
-	if (!result) {
+	const result = await db
+		.select({
+			amount: table.budget.amount,
+			id: table.budget.id
+		})
+		.from(table.budget)
+		.where(eq(table.budget.appliesTo, date))
+		.limit(1);
+
+	if (result.length === 0) {
 		return { amount: '200.00' };
 	}
-	return result;
+	return result[0];
 });
 
 export const changeBudget = form(async (formData) => {
-	const dbService = new DBService();
-
 	const data = Object.fromEntries(formData.entries());
 
 	const validateResult = changeBudgetSchema.safeParse(data);
@@ -24,8 +31,11 @@ export const changeBudget = form(async (formData) => {
 		return ERRORS.BAD_REQUEST();
 	}
 
-	//console.log(validateResult.data);
-	const insertResult = await dbService.insertOrUpdateBudget(validateResult.data);
+	const insertResult = await db
+		.insert(table.budget)
+		.values(validateResult.data)
+		.onConflictDoUpdate({ set: validateResult.data, target: table.budget.appliesTo })
+		.returning();
 
 	await getBudgetByAppliesTo(insertResult[0].appliesTo).refresh();
 });

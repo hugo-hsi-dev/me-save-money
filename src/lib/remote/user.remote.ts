@@ -1,23 +1,29 @@
-import { command, query } from '$app/server';
+import { command, getRequestEvent, query } from '$app/server';
 import { USER_CONFIG } from '$lib/config';
-import { DBService } from '$lib/server/service/db';
-import { LocalsService } from '$lib/server/service/locals';
+import { db } from '$lib/server/db';
+import * as table from '$lib/server/db/schema';
+import { ERRORS } from '$lib/server/errors';
+import { eq } from 'drizzle-orm';
 import z from 'zod';
 
 export const getUser = query(async () => {
-	// await sleep();
-	const localsService = new LocalsService();
-	return localsService.validateSession().user;
+	const session = getRequestEvent().locals.session;
+	if (!session) {
+		return ERRORS.UNAUTHORIZED();
+	}
+	return session.user;
 });
 
 export const changeUser = command(z.object({ user: z.enum(USER_CONFIG) }), async ({ user }) => {
-	const localsService = new LocalsService();
-	const dbService = new DBService();
+	const session = getRequestEvent().locals.session;
+	if (!session) {
+		return ERRORS.UNAUTHORIZED();
+	}
 
-	const sessionId = localsService.getSessionId();
+	await db.update(table.session).set({ user }).where(eq(table.session.id, session.id));
 
-	await dbService.updateSessionById({ id: sessionId, user });
-	localsService.setUser(user);
+	// Update the current session in locals
+	session.user = user;
 
 	await getUser().refresh();
 });
