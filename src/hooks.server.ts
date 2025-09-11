@@ -1,48 +1,66 @@
 import type { Handle } from '@sveltejs/kit';
 
-import { CookiesService } from '$lib/server/service/cookies';
-import { DBService } from '$lib/server/service/db';
-import { LocalsService } from '$lib/server/service/locals';
-import { SessionService } from '$lib/server/service/session';
+import { db } from '$lib/server/db';
+import * as table from '$lib/server/db/schema';
+import {
+	generateSessionExpiration,
+	hashSessionToken,
+	isSessionExpired
+} from '$lib/server/utils/session-tokens';
+import { eq } from 'drizzle-orm';
 
 export const handle: Handle = async ({ event, resolve }) => {
-	const cookiesService = new CookiesService(event.cookies);
-	const localsService = new LocalsService(event.locals);
-	const sessionToken = cookiesService.getSessionToken();
+	const sessionToken = event.cookies.get('session');
 
 	if (!sessionToken) {
-		localsService.setSessionNull();
+		event.locals.session = null;
 		return resolve(event);
 	}
 
-	const sessionService = new SessionService();
-	const dbService = new DBService();
+	const sessionId = hashSessionToken(sessionToken);
+	const result = await db
+		.select({ expiresAt: table.session.expiresAt, user: table.session.user })
+		.from(table.session)
+		.where(eq(table.session.id, sessionId))
+		.limit(1);
 
-	const sessionId = sessionService.getIdFromToken(sessionToken);
-	const session = await dbService.selectOneSession(sessionId);
-
-	if (!session) {
-		cookiesService.invalidateSessionToken();
-		localsService.setSessionNull();
+	if (result.length === 0) {
+		event.cookies.set('session', '', {
+			httpOnly: true,
+			maxAge: 0,
+			path: '/',
+			sameSite: 'lax',
+			secure: import.meta.env.PROD
+		});
+		event.locals.session = null;
 		return resolve(event);
 	}
 
-	const isExpired = sessionService.checkIsExpired(session.expiresAt);
+	const session = result[0];
 
-	if (isExpired) {
-		cookiesService.invalidateSessionToken();
-		localsService.setSessionNull();
-		await dbService.deleteSession(sessionId);
+	if (isSessionExpired(session.expiresAt)) {
+		event.cookies.set('session', '', {
+			httpOnly: true,
+			maxAge: 0,
+			path: '/',
+			sameSite: 'lax',
+			secure: import.meta.env.PROD
+		});
+		event.locals.session = null;
+		await db.delete(table.session).where(eq(table.session.id, sessionId));
 		return resolve(event);
 	}
 
-	const newExpiresAt = sessionService.generateNewExpiration();
+	const newExpiresAt = generateSessionExpiration();
 
-	cookiesService.setSessionToken({
-		expiresAt: newExpiresAt,
-		token: sessionToken
+	event.cookies.set('session', sessionToken, {
+		expires: newExpiresAt,
+		httpOnly: true,
+		path: '/',
+		sameSite: 'lax',
+		secure: import.meta.env.PROD
 	});
-	localsService.setSession({ ...session, id: sessionId });
-	dbService.updateSessionById({ expiresAt: newExpiresAt, id: sessionId });
+	event.locals.session = { ...session, id: sessionId };
+	db.update(table.session).set({ expiresAt: newExpiresAt }).where(eq(table.session.id, sessionId));
 	return resolve(event);
 };

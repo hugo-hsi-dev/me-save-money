@@ -1,4 +1,6 @@
 <script lang="ts">
+	import ErrorText from '../ui/error-text.svelte';
+
 	let { error, input = '0' }: { error?: string | undefined; input?: string } = $props();
 	let value = $state(Number(input) * 100);
 	let formattedValue = $derived((value / 100).toFixed(2));
@@ -19,6 +21,6 @@
 			inputmode="numeric"
 			class="size-0 opacity-0"
 		/>
-		<p class="font-thin text-destructive">{error}</p>
+		<ErrorText {error} />
 	</label>
 </div>

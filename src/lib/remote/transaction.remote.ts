@@ -1,10 +1,10 @@
-import { command, form, query } from '$app/server';
-import { addTransactionSchema } from '$lib/components/transaction/add-transaction-form.svelte';
-import { changeTransactionSchema } from '$lib/components/transaction/edit-transaction-form.svelte';
+import { command, form, getRequestEvent, query } from '$app/server';
+import { addTransactionSchema, changeTransactionSchema } from '$lib/schemas/transaction';
+import { db } from '$lib/server/db';
+import * as table from '$lib/server/db/schema';
 import { ERRORS } from '$lib/server/errors';
-import { DBService } from '$lib/server/service/db';
-import { LocalsService } from '$lib/server/service/locals';
-import { WeekService } from '$lib/server/service/week';
+import { eq, sql, sum } from 'drizzle-orm';
+import { nanoid } from 'nanoid';
 import z from 'zod';
 
 export const createNewTransaction = form(async (formData) => {
@@ -15,10 +15,13 @@ export const createNewTransaction = form(async (formData) => {
 		return { error: result.error.issues, success: false };
 	}
 
-	const dbService = new DBService();
-	const localsService = new LocalsService();
+	const session = getRequestEvent().locals.session;
+	if (!session) {
+		return ERRORS.UNAUTHORIZED();
+	}
 
-	await dbService.insertTransaction({ ...result.data, user: localsService.validateSession().user });
+	await db.insert(table.transaction).values({ id: nanoid(), ...result.data, user: session.user });
+
 	return { error: undefined, success: true };
 });
 
@@ -30,44 +33,109 @@ export const changeTransaction = form(async (formData) => {
 	if (!validateResult.success) {
 		return ERRORS.BAD_REQUEST();
 	}
-	const dbService = new DBService();
 
-	await dbService.updateTransaction(validateResult.data);
+	await db
+		.update(table.transaction)
+		.set({ amount: validateResult.data.amount, name: validateResult.data.name })
+		.where(eq(table.transaction.id, validateResult.data.id));
 });
 
 export const deleteTransaction = command(z.object({ id: z.string() }), async ({ id }) => {
-	const dbService = new DBService();
+	const transaction = await db
+		.delete(table.transaction)
+		.where(eq(table.transaction.id, id))
+		.returning();
 
-	const transaction = await dbService.deleteTransaction(id);
-	if (transaction.length > 0) await getTransactionByWeek(transaction[0].forWeek).refresh();
+	if (transaction.length > 0) {
+		await getTransactionByWeek(transaction[0].forWeek).refresh();
+	}
 });
 
 export const getTransactionByWeek = query(z.date(), async (date) => {
-	// await sleep();
-	const dbService = new DBService();
-	const data = await dbService.selectTransactionsByForWeek(date);
+	const data = await db
+		.select({
+			amount: table.transaction.amount,
+			forWeek: table.transaction.forWeek,
+			id: table.transaction.id,
+			name: table.transaction.name,
+			paidAt: table.transaction.paidAt,
+			user: table.transaction.user
+		})
+		.from(table.transaction)
+		.where(eq(table.transaction.forWeek, date));
+
 	return data.sort((a, b) => a.paidAt.getTime() - b.paidAt.getTime());
 });
 
 export const getAmountSpentByWeek = query(
 	z.object({ forWeek: z.date(), timezone: z.string() }),
 	async ({ forWeek, timezone }) => {
-		// await sleep();
-		const dbService = new DBService();
-		const result = await dbService.selectAmountSpentByForWeek({ forWeek, timezone });
-		if (!result) return { amount: '0' };
-		return result;
+		const week = sql`${table.transaction.forWeek} AT TIME ZONE '${sql.raw(timezone)}'`.mapWith(
+			table.transaction.forWeek
+		);
+
+		const result = await db
+			.select({
+				amount: sql<string>`COALESCE(${sum(table.transaction.amount)}, '0')`
+			})
+			.from(table.transaction)
+			.groupBy(week)
+			.where(eq(table.transaction.forWeek, forWeek))
+			.limit(1);
+
+		if (result.length === 0) return { amount: '0' };
+		return result[0];
 	}
 );
 
 export const getAmountSpentPerWeek = query(z.string(), async (timezone) => {
-	// await sleep();
-	const dbService = new DBService();
-	const weekService = new WeekService();
-	const result = await dbService.selectAmountSpentPerWeek(timezone);
+	const week = sql`${table.transaction.forWeek} AT TIME ZONE '${sql.raw(timezone)}'`.mapWith(
+		table.transaction.forWeek
+	);
 
-	const grouped = weekService.groupAmountSpentByYear(result);
-	const sorted = weekService.sortGroupedAmountSpentByYear(grouped);
+	const result = await db
+		.select({
+			amount: sql<string>`COALESCE(${sum(table.transaction.amount)}, '0')`,
+			week
+		})
+		.from(table.transaction)
+		.groupBy(week);
+
+	// Group by year and nest the data one layer down
+	const groupedByYear = result.reduce(
+		(acc: { weeks: { amount: string; week: Date }[]; year: number }[], curr) => {
+			const year = new Date(curr.week).getFullYear();
+			const existingYear = acc.find((y) => y.year === year);
+
+			if (existingYear) {
+				existingYear.weeks.push({
+					amount: curr.amount?.toString() || '0',
+					week: new Date(curr.week)
+				});
+			} else {
+				acc.push({
+					weeks: [
+						{
+							amount: curr.amount?.toString() || '0',
+							week: new Date(curr.week)
+						}
+					],
+					year
+				});
+			}
+
+			return acc;
+		},
+		[]
+	);
+
+	// Sort by year descending and weeks descending within each year
+	const sorted = groupedByYear
+		.sort((a, b) => b.year - a.year)
+		.map((yearData) => ({
+			...yearData,
+			weeks: yearData.weeks.sort((a, b) => b.week.getTime() - a.week.getTime())
+		}));
 
 	return sorted;
 });
