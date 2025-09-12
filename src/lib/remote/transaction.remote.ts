@@ -139,3 +139,4 @@ export const getAmountSpentPerWeek = query(z.string(), async (timezone) => {
 
 	return sorted;
 });
+
