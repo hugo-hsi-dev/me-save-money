@@ -3,7 +3,7 @@ import { addTransactionSchema, changeTransactionSchema } from '$lib/schemas/tran
 import { db } from '$lib/server/db';
 import * as table from '$lib/server/db/schema';
 import { ERRORS } from '$lib/server/errors';
-import { eq, sql, sum } from 'drizzle-orm';
+import { eq, inArray, sql, sum } from 'drizzle-orm';
 import { nanoid } from 'nanoid';
 import z from 'zod';
 
@@ -47,24 +47,42 @@ export const deleteTransaction = command(z.object({ id: z.string() }), async ({ 
 		.returning();
 
 	if (transaction.length > 0) {
-		await getTransactionByWeek(transaction[0].forWeek).refresh();
+		await getTransactionIdsByWeek(transaction[0].forWeek).refresh();
 	}
 });
 
-export const getTransactionByWeek = query(z.date(), async (date) => {
+export const getTransactionIdsByWeek = query(z.date(), async (date) => {
 	const data = await db
 		.select({
+			// amount: table.transaction.amount,
+			// forWeek: table.transaction.forWeek,
+			id: table.transaction.id,
+			// name: table.transaction.name,
+			paidAt: table.transaction.paidAt
+			// user: table.transaction.user,
+		})
+		.from(table.transaction)
+		.where(eq(table.transaction.forWeek, date));
+
+	return data.sort((a, b) => a.paidAt.getTime() - b.paidAt.getTime());
+});
+
+export const getTransactionsById = query.batch(z.string(), async (ids) => {
+	const transactions = await db
+		.select({
 			amount: table.transaction.amount,
-			forWeek: table.transaction.forWeek,
+			// forWeek: table.transaction.forWeek,
 			id: table.transaction.id,
 			name: table.transaction.name,
 			paidAt: table.transaction.paidAt,
 			user: table.transaction.user
 		})
 		.from(table.transaction)
-		.where(eq(table.transaction.forWeek, date));
+		.where(inArray(table.transaction.id, ids));
 
-	return data.sort((a, b) => a.paidAt.getTime() - b.paidAt.getTime());
+	const lookup = new Map(transactions.map((transaction) => [transaction.id, transaction]));
+
+	return (id) => lookup.get(id);
 });
 
 export const getAmountSpentByWeek = query(
