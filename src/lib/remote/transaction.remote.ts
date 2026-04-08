@@ -7,37 +7,19 @@ import { eq, inArray, sql, sum } from 'drizzle-orm';
 import { nanoid } from 'nanoid';
 import z from 'zod';
 
-export const createNewTransaction = form(async (formData) => {
-	const rawData = Object.fromEntries(formData.entries());
-	const result = addTransactionSchema.safeParse(rawData);
-
-	if (!result.success) {
-		return { error: result.error.issues, success: false };
-	}
-
+export const createNewTransaction = form(addTransactionSchema, async (data) => {
 	const session = getRequestEvent().locals.session;
 	if (!session) {
 		return ERRORS.UNAUTHORIZED();
 	}
 
-	await db.insert(table.transaction).values({ id: nanoid(), ...result.data, user: session.user });
+	await db.insert(table.transaction).values({ id: nanoid(), ...data, user: session.user });
 
 	return { error: undefined, success: true };
 });
 
-export const changeTransaction = form(async (formData) => {
-	const data = Object.fromEntries(formData.entries());
-
-	const validateResult = changeTransactionSchema.safeParse(data);
-
-	if (!validateResult.success) {
-		return ERRORS.BAD_REQUEST();
-	}
-
-	await db
-		.update(table.transaction)
-		.set({ amount: validateResult.data.amount, name: validateResult.data.name })
-		.where(eq(table.transaction.id, validateResult.data.id));
+export const changeTransaction = form(changeTransactionSchema, async ({ amount, id, name }) => {
+	await db.update(table.transaction).set({ amount, name }).where(eq(table.transaction.id, id));
 });
 
 export const deleteTransaction = command(z.object({ id: z.string() }), async ({ id }) => {

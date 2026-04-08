@@ -2,8 +2,13 @@
 	import ErrorText from '../ui/error-text.svelte';
 
 	let { error, input = '0' }: { error?: string | undefined; input?: string } = $props();
-	let value = $state(Number(input) * 100);
+	// eslint-disable-next-line svelte/prefer-writable-derived -- bind:value requires writable state
+	let value = $state(0);
 	let formattedValue = $derived((value / 100).toFixed(2));
+
+	$effect(() => {
+		value = Number(input) * 100;
+	});
 	let componentId = $props.id();
 	let isFocused = $state(false);
 </script>
