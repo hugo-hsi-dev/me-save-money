@@ -1,15 +1,13 @@
 <script lang="ts">
-	import ErrorText from '../ui/error-text.svelte';
 	import { sanitizeAmountInput } from '$lib/utils/amount';
+
+	import ErrorText from '../ui/error-text.svelte';
 
 	let { error, input = '0' }: { error?: string | undefined; input?: string } = $props();
 
-	let value = $state('0');
-	let formattedValue = $derived((Number(value) / 100).toFixed(2));
-
-	$effect(() => {
-		value = sanitizeAmountInput(input);
-	});
+	let value = $state<string | undefined>(undefined);
+	let displayValue = $derived(value ?? sanitizeAmountInput(input));
+	let formattedValue = $derived((Number(displayValue) / 100).toFixed(2));
 	let componentId = $props.id();
 	let isFocused = $state(false);
 
@@ -31,7 +29,7 @@
 		<span class={['text-7xl font-bold', { 'text-primary': isFocused }]}>${formattedValue}</span>
 		<input
 			type="text"
-			value={value}
+			value={displayValue}
 			oninput={handleInput}
 			onfocus={() => (isFocused = true)}
 			onblur={() => (isFocused = false)}
