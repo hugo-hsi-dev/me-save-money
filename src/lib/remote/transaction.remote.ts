@@ -3,41 +3,23 @@ import { addTransactionSchema, changeTransactionSchema } from '$lib/schemas/tran
 import { db } from '$lib/server/db';
 import * as table from '$lib/server/db/schema';
 import { ERRORS } from '$lib/server/errors';
-import { eq, sql, sum } from 'drizzle-orm';
+import { eq, inArray, sql, sum } from 'drizzle-orm';
 import { nanoid } from 'nanoid';
 import z from 'zod';
 
-export const createNewTransaction = form(async (formData) => {
-	const rawData = Object.fromEntries(formData.entries());
-	const result = addTransactionSchema.safeParse(rawData);
-
-	if (!result.success) {
-		return { error: result.error.issues, success: false };
-	}
-
+export const createNewTransaction = form(addTransactionSchema, async (data) => {
 	const session = getRequestEvent().locals.session;
 	if (!session) {
 		return ERRORS.UNAUTHORIZED();
 	}
 
-	await db.insert(table.transaction).values({ id: nanoid(), ...result.data, user: session.user });
+	await db.insert(table.transaction).values({ id: nanoid(), ...data, user: session.user });
 
 	return { error: undefined, success: true };
 });
 
-export const changeTransaction = form(async (formData) => {
-	const data = Object.fromEntries(formData.entries());
-
-	const validateResult = changeTransactionSchema.safeParse(data);
-
-	if (!validateResult.success) {
-		return ERRORS.BAD_REQUEST();
-	}
-
-	await db
-		.update(table.transaction)
-		.set({ amount: validateResult.data.amount, name: validateResult.data.name })
-		.where(eq(table.transaction.id, validateResult.data.id));
+export const changeTransaction = form(changeTransactionSchema, async ({ amount, id, name }) => {
+	await db.update(table.transaction).set({ amount, name }).where(eq(table.transaction.id, id));
 });
 
 export const deleteTransaction = command(z.object({ id: z.string() }), async ({ id }) => {
@@ -47,24 +29,42 @@ export const deleteTransaction = command(z.object({ id: z.string() }), async ({ 
 		.returning();
 
 	if (transaction.length > 0) {
-		await getTransactionByWeek(transaction[0].forWeek).refresh();
+		await getTransactionIdsByWeek(transaction[0].forWeek).refresh();
 	}
 });
 
-export const getTransactionByWeek = query(z.date(), async (date) => {
+export const getTransactionIdsByWeek = query(z.date(), async (date) => {
 	const data = await db
 		.select({
+			// amount: table.transaction.amount,
+			// forWeek: table.transaction.forWeek,
+			id: table.transaction.id,
+			// name: table.transaction.name,
+			paidAt: table.transaction.paidAt
+			// user: table.transaction.user,
+		})
+		.from(table.transaction)
+		.where(eq(table.transaction.forWeek, date));
+
+	return data.sort((a, b) => a.paidAt.getTime() - b.paidAt.getTime());
+});
+
+export const getTransactionsById = query.batch(z.string(), async (ids) => {
+	const transactions = await db
+		.select({
 			amount: table.transaction.amount,
-			forWeek: table.transaction.forWeek,
+			// forWeek: table.transaction.forWeek,
 			id: table.transaction.id,
 			name: table.transaction.name,
 			paidAt: table.transaction.paidAt,
 			user: table.transaction.user
 		})
 		.from(table.transaction)
-		.where(eq(table.transaction.forWeek, date));
+		.where(inArray(table.transaction.id, ids));
 
-	return data.sort((a, b) => a.paidAt.getTime() - b.paidAt.getTime());
+	const lookup = new Map(transactions.map((transaction) => [transaction.id, transaction]));
+
+	return (id) => lookup.get(id);
 });
 
 export const getAmountSpentByWeek = query(

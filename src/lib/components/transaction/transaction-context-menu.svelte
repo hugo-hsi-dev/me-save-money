@@ -5,10 +5,16 @@
 	import TrashIcon from '@lucide/svelte/icons/trash-2';
 	import * as ContextMenu from '$lib/components/ui/context-menu';
 
-	import type { Transaction } from './transaction-list.svelte';
-
 	import DeleteTransactionDialog from './delete-transaction-dialog.svelte';
 	import EditTransactionDrawer from './edit-transaction-drawer.svelte';
+
+	type Transaction = {
+		amount: string;
+		id: string;
+		name: string;
+		paidAt: Date;
+		user: string;
+	};
 
 	let openEdit = $state(false);
 	let openDelete = $state(false);
@@ -46,5 +52,5 @@
 	</ContextMenu.Content>
 </ContextMenu.Root>
 
-<EditTransactionDrawer bind:open={openEdit} {transaction} />
+<EditTransactionDrawer bind:open={openEdit} id={transaction.id} />
 <DeleteTransactionDialog bind:open={openDelete} {...transaction} />

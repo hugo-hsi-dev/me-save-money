@@ -8,3 +8,9 @@ bun.lockb
 # Miscellaneous
 /static/
 /drizzle/
+
+# Local agent workspace files
+/.agents/
+/.pi/
+skills-lock.json
+query.batch

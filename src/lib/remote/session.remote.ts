@@ -15,6 +15,7 @@ export const signIn = command(
 		pin: z.string().length(6)
 	}),
 	async ({ pin }) => {
+		console.log(pin);
 		const isValid = pin === PIN;
 
 		if (!isValid) {
